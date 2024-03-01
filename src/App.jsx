@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
 
 import "./index.css";
-import { AppContext } from "./context/AppContext";
+import { AppContext } from "@/components/Index";
 
 function App() {
   const { progress, setProgress } = useContext(AppContext);
@@ -16,7 +16,7 @@ function App() {
         shadow="true"
         className="pb-1"
       />
-      <div className="mx-20 my-4">
+      <div className="sm:mx-20 my-4">
         <Outlet />
       </div>
     </>

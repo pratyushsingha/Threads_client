@@ -1,14 +1,16 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Home from "./pages/Home.jsx";
-import Register from "./pages/auth/Register.jsx";
-import AppContextProvider from "./context/AppContext.jsx";
-import { Toaster } from "./components/ui/toaster.jsx";
-import { ThemeProvider } from "./context/theme-provider.jsx";
-import Login from "./pages/auth/Login.jsx";
+import {
+  Home,
+  Register,
+  AppContextProvider,
+  Toaster,
+  ThemeProvider,
+  Login,
+  App,
+} from "@/components/Index";
+import "./index.css";
+import TweetDetails from "./pages/TweetDetails";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <Home /> },
+      { path: "/tweet/:id", element: <TweetDetails /> },
       {
         path: "/register",
         element: <Register />,
