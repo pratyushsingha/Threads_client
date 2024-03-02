@@ -3,10 +3,15 @@ import { Outlet } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
 
 import "./index.css";
-import { AppContext } from "@/components/Index";
+import {
+  AppContext,
+  Container,
+  Sidebar,
+  Spinner,
+} from "@/components/Index";
 
 function App() {
-  const { progress, setProgress } = useContext(AppContext);
+  const { progress, setProgress, loading } = useContext(AppContext);
   return (
     <>
       <LoadingBar
@@ -16,9 +21,19 @@ function App() {
         shadow="true"
         className="pb-1"
       />
-      <div className="sm:mx-20 my-4">
-        <Outlet />
-      </div>
+
+      <Container>
+        <div className="sm:mx-20 my-4">
+          <div className="grid grid-4 gap-4 sm:grid-cols-12">
+            <Sidebar />
+            {loading && <Spinner />}
+            <div className="sm:col-span-8 col-span-10 overscroll-y-auto">
+              <Outlet />
+            </div>
+            <div className="hidden sm:block sm:col-span-2">who to follow</div>
+          </div>
+        </div>
+      </Container>
     </>
   );
 }

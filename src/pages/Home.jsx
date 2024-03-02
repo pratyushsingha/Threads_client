@@ -1,21 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-import {
-  Container,
-  Sidebar,
-  AppContext,
-  TweetCard,
-  Spinner,
-  useToast,
-} from "@/components/Index";
+import { AppContext, TweetCard, Spinner, useToast } from "@/components/Index";
 
 const Home = () => {
   const { toast } = useToast();
-  const { progress, setProgress } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
+  const { infiniteScroll, page } = useContext(AppContext);
+
+  const [progress, setProgress] = useState(0);
   const [tweets, setTweets] = useState([]);
-  const [page, setPage] = useState(1);
 
   const getFeedTweets = async () => {
     setLoading(true);
@@ -90,20 +84,6 @@ const Home = () => {
     }
   };
 
-  const infiniteScroll = async () => {
-    try {
-      if (
-        window.innerHeight + document.documentElement.scrollTop + 1 >=
-        document.documentElement.scrollHeight
-      ) {
-        setLoading(true);
-        setPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     getFeedTweets();
   }, [page]);
@@ -114,23 +94,16 @@ const Home = () => {
   }, []);
 
   return (
-    <Container>
-      <div className="grid grid-4 gap-4 sm:grid-cols-12">
-        <Sidebar />
-        {loading && <Spinner />}
-        <div className="sm:col-span-8 col-span-10 overscroll-y-auto">
-          {tweets.map((tweet, index) => (
-            <TweetCard
-              key={index}
-              tweet={tweet}
-              toggleLike={toggleLike}
-              bookMarkTweet={bookMarkTweet}
-            />
-          ))}
-        </div>
-        <div className="hidden sm:block sm:col-span-2">who to follow</div>
-      </div>
-    </Container>
+    <>
+      {tweets.map((tweet, index) => (
+        <TweetCard
+          key={index}
+          tweet={tweet}
+          toggleLike={toggleLike}
+          bookMarkTweet={bookMarkTweet}
+        />
+      ))}
+    </>
   );
 };
 
