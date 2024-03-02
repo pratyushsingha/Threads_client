@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { Heart, Bookmark, Share2, MessageCircle, Copy } from "lucide-react";
@@ -18,13 +18,15 @@ import {
   useToast,
 } from "@/components/Index";
 
-const TweetCard = ({ tweet, toggleLike, bookMarkTweet }) => {
+const TweetCard = ({ tweet, bookMarkTweet, toggleLike }) => {
   const { toast } = useToast();
   const inputRef = useRef();
 
   const handleCopy = () => {
     inputRef.current?.select();
-    window.navigator.clipboard.writeText(`${window.location.href}${tweet._id}`);
+    window.navigator.clipboard.writeText(
+      `${window.location.href}tweet/${tweet._id}`
+    );
     toast({
       title: "Copied to clipboard",
     });
@@ -121,7 +123,7 @@ const TweetCard = ({ tweet, toggleLike, bookMarkTweet }) => {
                       </Label>
                       <Input
                         id="link"
-                        defaultValue={`${window.location.href}${tweet._id}`}
+                        defaultValue={`${window.location.href}tweet/${tweet._id}`}
                         readOnly
                         ref={inputRef}
                       />

@@ -26,6 +26,7 @@ import TweetCard from "@/components/TweetCard";
 import Spinner from "@/components/loader/Spinner";
 import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
+import CommentCard from "@/components/CommentCard";
 
 export {
   sidebarItems,
@@ -53,4 +54,5 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  CommentCard,
 };
