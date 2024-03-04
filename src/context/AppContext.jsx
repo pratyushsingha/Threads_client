@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
 import { useToast } from "@/components/Index";
@@ -12,6 +12,7 @@ export default function AppContextProvider({ children }) {
   const [progress, setProgress] = useState(0);
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
+  const [userDetails, setUserDetails] = useState({});
 
   const getFeedTweets = async () => {
     setLoading(true);
@@ -100,6 +101,25 @@ export default function AppContextProvider({ children }) {
     }
   };
 
+  const currentUser = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/current-user`,
+        { withCredentials: true }
+      );
+      setUserDetails(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    currentUser();
+  }, []);
+
   const value = {
     progress,
     setProgress,
@@ -111,6 +131,8 @@ export default function AppContextProvider({ children }) {
     loading,
     page,
     setTweets,
+    userDetails,
+    setLoading,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

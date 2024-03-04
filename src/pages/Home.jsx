@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-import { AppContext, TweetCard, Spinner, useToast } from "@/components/Index";
+import { AppContext, TweetCard, useToast, TweetBox } from "@/components/Index";
 
 const Home = () => {
   const { toast } = useToast();
@@ -95,6 +95,7 @@ const Home = () => {
 
   return (
     <>
+      <TweetBox />
       {tweets.map((tweet, index) => (
         <TweetCard
           key={index}

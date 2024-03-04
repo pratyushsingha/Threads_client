@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "./ui/separator";
+import { Switch } from "./ui/switch";
 
 import Login from "@/pages/auth/Login.jsx";
 import App from "@/App";
@@ -27,6 +29,7 @@ import Spinner from "@/components/loader/Spinner";
 import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
 import CommentCard from "@/components/CommentCard";
+import TweetBox from "@/components/TweetBox";
 
 export {
   sidebarItems,
@@ -55,4 +58,7 @@ export {
   DialogTitle,
   DialogTrigger,
   CommentCard,
+  TweetBox,
+  Separator,
+  Switch,
 };
