@@ -1,4 +1,4 @@
-import { sidebarItems } from "@/utils";
+import { sidebarItems, profileRoutes } from "@/utils";
 import { Button } from "./ui/button";
 import { AppContext } from "@/context/AppContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -18,6 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import Login from "@/pages/auth/Login.jsx";
 import App from "@/App";
@@ -30,9 +38,15 @@ import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
 import CommentCard from "@/components/CommentCard";
 import TweetBox from "@/components/TweetBox";
+import TweetDetails from "@/pages/TweetDetails";
+import Profile from "@/pages/auth/Profile";
+import UserDetails from "@/pages/auth/UserDetails";
+import InputDiv from "./InputDiv";
+import PassStrengthBar from "./PaawordStrengthBar";
 
 export {
   sidebarItems,
+  profileRoutes,
   Button,
   Container,
   Sidebar,
@@ -61,4 +75,15 @@ export {
   TweetBox,
   Separator,
   Switch,
+  TweetDetails,
+  Profile,
+  UserDetails,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  InputDiv,
+  PassStrengthBar,
 };
