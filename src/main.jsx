@@ -8,9 +8,11 @@ import {
   ThemeProvider,
   Login,
   App,
+  TweetDetails,
+  Profile,
+  UserDetails,
 } from "@/components/Index";
 import "./index.css";
-import TweetDetails from "./pages/TweetDetails";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,13 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/tweet/:id", element: <TweetDetails /> },
+      {
+        path: "/profile/:username",
+        element: <Profile />,
+        children: [
+          { path: "/profile/:username/edit", element: <UserDetails /> },
+        ],
+      },
       {
         path: "/register",
         element: <Register />,

@@ -27,3 +27,21 @@ export const sidebarItems = [
     icon: <BookmarkCheck />,
   },
 ];
+
+export const profileRoutes = [
+  {
+    _id: 1,
+    title: "Tweets",
+    path: "",
+  },
+  {
+    _id: 2,
+    title: "Liked Tweets",
+    path: "likedTweets",
+  },
+  {
+    _id: 3,
+    title: "Bookmarked Tweets",
+    path: "bookmarkedTweets",
+  },
+];

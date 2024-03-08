@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import {
   AppContext,
   Button,
@@ -16,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const TweetBox = () => {
   const { toast } = useToast();
-  const { userDetails, setLoading } = useContext(AppContext);
+  const { currentUserDetails, setLoading } = useContext(AppContext);
   const [openImoji, setOpenImoji] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [tagClick, setTagClick] = useState(false);
@@ -115,11 +117,15 @@ const TweetBox = () => {
     <form onSubmit={handleSubmit(createTweet)}>
       <div className="relative flex-col border-slate border-2 rounded px-2 py-2 my-4">
         <div className="flex space-x-5 w-full ">
-          <img
-            className="h-10 w-10 shrink-0 sm:h-12 self-center sm:w-12 rounded-full"
-            src={userDetails.avatar}
-            alt=""
-          />
+          <div className="self-center">
+            <Link to={`/profile/${currentUserDetails.username}`}>
+              <img
+                className="h-10 w-10 shrink-0 sm:h-12 sm:w-12 rounded-full"
+                src={currentUserDetails.avatar}
+                alt=""
+              />
+            </Link>
+          </div>
           <div className="w-full relative">
             <textarea
               className="py-5 text-pretty text-xl border-none focus:border-none bg-black w-full focus:outline-none"

@@ -12,7 +12,7 @@ export default function AppContextProvider({ children }) {
   const [progress, setProgress] = useState(0);
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
-  const [userDetails, setUserDetails] = useState({});
+  const [currentUserDetails, setCurrentUserDetails] = useState({});
 
   const getFeedTweets = async () => {
     setLoading(true);
@@ -108,7 +108,7 @@ export default function AppContextProvider({ children }) {
         `${import.meta.env.VITE_BACKEND_URL}/users/current-user`,
         { withCredentials: true }
       );
-      setUserDetails(response.data.data);
+      setCurrentUserDetails(response.data.data);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -131,8 +131,9 @@ export default function AppContextProvider({ children }) {
     loading,
     page,
     setTweets,
-    userDetails,
+    currentUserDetails,
     setLoading,
+    currentUser,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
