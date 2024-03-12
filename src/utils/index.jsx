@@ -1,30 +1,29 @@
-import { Home, BellDot, Mails, Bot, BookmarkCheck } from "lucide-react";
+import { Home, BellDot, Mails, Bot } from "lucide-react";
 
 export const sidebarItems = [
   {
     _id: 1,
     title: "Home",
     icon: <Home />,
+    path: "",
   },
   {
     _id: 2,
     title: "Notifications",
     icon: <BellDot />,
+    path: "notifications",
   },
   {
     _id: 3,
     title: "Messages",
     icon: <Mails />,
+    path: "chat",
   },
   {
     _id: 4,
     title: "Grok",
     icon: <Bot />,
-  },
-  {
-    _id: 5,
-    title: "Bookmarks",
-    icon: <BookmarkCheck />,
+    path: "grok",
   },
 ];
 

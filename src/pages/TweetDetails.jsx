@@ -34,46 +34,6 @@ const TweetDetails = () => {
     }
   }, [id, setProgress]);
 
-  const toggleLike = async (tweetId, e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/like/tweet/${tweetId}`,
-        {},
-        { withCredentials: true }
-      );
-      const updatedTweet = response.data.data;
-      setTweet(updatedTweet);
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-    }
-  };
-
-  const bookMarkTweet = async (tweetId, e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/bookmarks/${tweetId}`,
-        {},
-        { withCredentials: true }
-      );
-      const updatedTweet = response.data.data;
-      setTweet(updatedTweet);
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-    }
-  };
-
   const toggleCommentLike = async (commentId, e) => {
     e.preventDefault();
     try {
@@ -149,12 +109,7 @@ const TweetDetails = () => {
   return (
     <>
       {tweet.map((t) => (
-        <TweetCard
-          key={t._id}
-          tweet={t}
-          bookMarkTweet={bookMarkTweet}
-          toggleLike={toggleLike}
-        />
+        <TweetCard key={t._id} tweet={t} setTweets={setTweet} />
       ))}
       {comments.map((comment) => (
         <CommentCard
