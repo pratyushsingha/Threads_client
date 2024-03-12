@@ -34,56 +34,6 @@ const Home = () => {
     }
   };
 
-  const toggleLike = async (tweetId, e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/like/tweet/${tweetId}`,
-        {},
-        { withCredentials: true }
-      );
-      const updatedTweet = response.data.data[0];
-      setTweets((prevTweets) =>
-        prevTweets.map((tweet) =>
-          tweet._id === updatedTweet._id ? updatedTweet : tweet
-        )
-      );
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-    }
-  };
-
-  const bookMarkTweet = async (tweetId, e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/bookmarks/${tweetId}`,
-        {},
-        { withCredentials: true }
-      );
-      // console.log(response.data.data[0]);
-
-      const updatedTweet = response.data.data[0];
-      setTweets((prevTweets) =>
-        prevTweets.map((tweet) =>
-          tweet._id === updatedTweet._id ? updatedTweet : tweet
-        )
-      );
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-    }
-  };
-
   useEffect(() => {
     getFeedTweets();
   }, [page]);
@@ -97,12 +47,7 @@ const Home = () => {
     <>
       <TweetBox />
       {tweets.map((tweet, index) => (
-        <TweetCard
-          key={index}
-          tweet={tweet}
-          toggleLike={toggleLike}
-          bookMarkTweet={bookMarkTweet}
-        />
+        <TweetCard key={index} tweet={tweet} setTweets={setTweets} />
       ))}
     </>
   );

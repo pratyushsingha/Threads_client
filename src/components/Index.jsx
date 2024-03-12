@@ -43,6 +43,8 @@ import Profile from "@/pages/auth/Profile";
 import UserDetails from "@/pages/auth/UserDetails";
 import InputDiv from "./InputDiv";
 import PassStrengthBar from "./PaawordStrengthBar";
+import Tweets from "@/pages/Tweets";
+import BookmarkedTweets from "@/pages/BookmarkedTweets";
 
 export {
   sidebarItems,
@@ -86,4 +88,6 @@ export {
   CardTitle,
   InputDiv,
   PassStrengthBar,
+  Tweets,
+  BookmarkedTweets,
 };

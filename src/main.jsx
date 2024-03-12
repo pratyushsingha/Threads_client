@@ -11,8 +11,11 @@ import {
   TweetDetails,
   Profile,
   UserDetails,
+  Tweets,
+  BookmarkedTweets
 } from "@/components/Index";
 import "./index.css";
+import LikedTweets from "./pages/LikedTweets";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +28,9 @@ const router = createBrowserRouter([
         path: "/profile/:username",
         element: <Profile />,
         children: [
+          { path: "/profile/:username/", element: <Tweets /> },
+          { path: "/profile/:username/bookmarkedTweets", element: <BookmarkedTweets /> },
+          { path: "/profile/:username/likedTweets", element: <LikedTweets /> },
           { path: "/profile/:username/edit", element: <UserDetails /> },
         ],
       },

@@ -2,6 +2,7 @@ import { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { Heart, Bookmark, Share2, MessageCircle, Copy } from "lucide-react";
+import axios from "axios";
 
 import {
   Label,
@@ -16,20 +17,85 @@ import {
   DialogTrigger,
   Button,
   useToast,
+  AppContext,
 } from "@/components/Index";
 
-const TweetCard = ({ tweet, bookMarkTweet, toggleLike }) => {
+const TweetCard = ({
+  tweet,
+  setTweets,
+  removeFromBookmarks,
+  removeFromLikes,
+}) => {
   const { toast } = useToast();
   const inputRef = useRef();
 
   const handleCopy = () => {
     inputRef.current?.select();
     window.navigator.clipboard.writeText(
-      `${window.location.href}tweet/${tweet._id}`
+      `${import.meta.env.VITE_FRONTEND_URL}/tweet/${tweet._id}`
     );
     toast({
       title: "Copied to clipboard",
     });
+  };
+
+  const toggleLike = async (tweetId, e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/like/tweet/${tweetId}`,
+        {},
+        { withCredentials: true }
+      );
+      const updatedTweet = response.data.data[0];
+      setTweets((prevTweets) =>
+        prevTweets.map((tweet) =>
+          tweet._id === updatedTweet._id ? updatedTweet : tweet
+        )
+      );
+
+      if (typeof removeFromLikes === "function" && !updatedTweet.isLiked) {
+        removeFromLikes(tweetId);
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "error",
+        description: `${error.message}`,
+      });
+    }
+  };
+
+  const bookMarkTweet = async (tweetId, e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/bookmarks/${tweetId}`,
+        {},
+        { withCredentials: true }
+      );
+
+      const updatedTweet = response.data.data[0];
+      setTweets((prevTweets) =>
+        prevTweets.map((tweet) =>
+          tweet._id === updatedTweet._id ? updatedTweet : tweet
+        )
+      );
+      if (
+        typeof removeFromBookmarks === "function" &&
+        !updatedTweet.isBookmarked
+      ) {
+        removeFromBookmarks(tweetId);
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "error",
+        description: `${error.message}`,
+      });
+    }
   };
 
   return (
@@ -42,18 +108,21 @@ const TweetCard = ({ tweet, bookMarkTweet, toggleLike }) => {
                 ? "https://i.postimg.cc/Pxd7wvnh/image.png"
                 : tweet?.ownerDetails?.avatar
             }
-            alt={
-              tweet.isAnonymous ? "Anonymous" : tweet?.ownerDetails?.username
-            }
+            alt={tweet.isAnonymous ? "Anonymous" : tweet.ownerDetails?.username}
             className="h-full w-full rounded-full object-cover"
           />
         </div>
         <div className="pl-4 pt-1">
           <div className="mb-2 flex justify-between items-center gap-x-2">
             <div className="w-full">
-              <h2 className="inline-block font-bold">
-                {tweet.isAnonymous ? "Anonymous" : tweet.ownerDetails.username}
-              </h2>
+              {tweet.ownerDetails && (
+                <h2 className="inline-block font-bold">
+                  {tweet.isAnonymous
+                    ? "Anonymous"
+                    : tweet.ownerDetails.username}
+                </h2>
+              )}
+
               <span className="ml-2 inline-block text-sm text-gray-400">
                 {moment(tweet.updatedAt, "YYYYMMDD").fromNow()}
               </span>
@@ -123,7 +192,9 @@ const TweetCard = ({ tweet, bookMarkTweet, toggleLike }) => {
                       </Label>
                       <Input
                         id="link"
-                        defaultValue={`${window.location.href}tweet/${tweet._id}`}
+                        defaultValue={`${
+                          import.meta.env.VITE_FRONTEND_URL
+                        }/tweet/${tweet._id}`}
                         readOnly
                         ref={inputRef}
                       />
