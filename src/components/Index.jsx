@@ -26,6 +26,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox"
 
 import Login from "@/pages/auth/Login.jsx";
 import App from "@/App";
@@ -90,4 +91,5 @@ export {
   PassStrengthBar,
   Tweets,
   BookmarkedTweets,
+  Checkbox
 };

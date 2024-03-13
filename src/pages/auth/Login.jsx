@@ -23,6 +23,7 @@ import { AppContext } from "@/context/AppContext";
 import { Separator } from "@/components/ui/separator";
 import Container from "@/components/Container";
 import InputDiv from "@/components/InputDiv";
+import { Checkbox } from "@/components/Index";
 
 const loginSchema = z.object({
   username: z
@@ -40,6 +41,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const { progress, setProgress } = useContext(AppContext);
 
   const {
@@ -66,6 +68,10 @@ const Login = () => {
         },
         { withCredentials: true }
       );
+      if (rememberMe === true) {
+        localStorage.setItem("accessToken", response.data.data.accessToken);
+        console.log(rememberMe);
+      }
       toast({
         title: "success",
         description: `welcome back ${response.data.data.user.username}`,
@@ -132,6 +138,19 @@ const Login = () => {
               >
                 Forget password?
               </Link>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                defaultChecked={true}
+                onCheckedChange={(value) => setRememberMe(value)}
+                id="rememberMe"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Remember me
+              </label>
             </div>
             <div>
               <Button disabled={isSubmitting} className="w-full">

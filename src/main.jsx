@@ -11,16 +11,16 @@ import {
   TweetDetails,
   Profile,
   UserDetails,
-  Tweets,
-  BookmarkedTweets
+  Tweets,BookmarkedTweets,
 } from "@/components/Index";
 import "./index.css";
 import LikedTweets from "./pages/LikedTweets";
+import AuthLayout from "./components/AuthLayout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <AuthLayout />,
     children: [
       { path: "/", element: <Home /> },
       { path: "/tweet/:id", element: <TweetDetails /> },
@@ -29,20 +29,23 @@ const router = createBrowserRouter([
         element: <Profile />,
         children: [
           { path: "/profile/:username/", element: <Tweets /> },
-          { path: "/profile/:username/bookmarkedTweets", element: <BookmarkedTweets /> },
+          {
+            path: "/profile/:username/bookmarkedTweets",
+            element: <BookmarkedTweets />,
+          },
           { path: "/profile/:username/likedTweets", element: <LikedTweets /> },
           { path: "/profile/:username/edit", element: <UserDetails /> },
         ],
       },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
 ]);
 
