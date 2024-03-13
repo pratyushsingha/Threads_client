@@ -3,12 +3,7 @@ import { Outlet } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
 
 import "./index.css";
-import {
-  AppContext,
-  Container,
-  Sidebar,
-  Spinner,
-} from "@/components/Index";
+import { AppContext, Container, Sidebar, Spinner } from "@/components/Index";
 
 function App() {
   const { progress, setProgress, loading } = useContext(AppContext);
