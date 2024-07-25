@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { App, Spinner } from "./Index";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const AuthLayout = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
-      navigate("/login");
-      setLoading(false);
-    } else {
-      navigate("/");
-      setLoading(false);
-    }
-  }, [navigate, setLoading]);
+  const location = useLocation();
+  const { token } = useSelector((store) => store.auth);
 
-  return loading ? <Spinner /> : <App />;
+  useEffect(() => {
+    const isAuthenticated = !!token;
+
+    if (isAuthenticated && location.pathname === "/login") {
+      navigate("/");
+    } else if (!isAuthenticated && location.pathname !== "/login") {
+      navigate("/login");
+    }
+
+    setLoading(false);
+  }, [token, navigate, location.pathname]);
+
+  loading && <Spinner />;
+
+  return <App />;
 };
 
 export default AuthLayout;

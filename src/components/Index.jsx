@@ -1,6 +1,5 @@
-import { sidebarItems, profileRoutes } from "@/utils";
+import { sidebarItems, profileRoutes } from "@/utils/Index";
 import { Button } from "./ui/button";
-import { AppContext } from "@/context/AppContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster.jsx";
 import { ThemeProvider } from "@/context/theme-provider.jsx";
@@ -26,14 +25,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
 
 import Login from "@/pages/auth/Login.jsx";
 import App from "@/App";
 import Home from "@/pages/Home";
-import AppContextProvider from "@/context/AppContext";
 import Register from "@/pages/auth/Register.jsx";
-import TweetCard from "@/components/TweetCard";
+import TweetCard from "@/components/Tweet";
 import Spinner from "@/components/loader/Spinner";
 import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
@@ -53,13 +51,11 @@ export {
   Button,
   Container,
   Sidebar,
-  AppContext,
   TweetCard,
   Spinner,
   useToast,
   Home,
   Register,
-  AppContextProvider,
   Toaster,
   ThemeProvider,
   Login,
@@ -91,5 +87,5 @@ export {
   PassStrengthBar,
   Tweets,
   BookmarkedTweets,
-  Checkbox
+  Checkbox,
 };
