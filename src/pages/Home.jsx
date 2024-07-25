@@ -1,56 +1,93 @@
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
-
-import { AppContext, TweetCard, useToast, TweetBox } from "@/components/Index";
+import { useDispatch, useSelector } from "react-redux";
+import { setPage, setTweetBoxType } from "@/features/tweetSlice";
+import {
+  TweetBox,
+  Spinner,
+  Input,
+  Button,
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+} from "@/components/Index";
+import InfiniteScroll from "react-infinite-scroll-component";
+import TweetCard from "@/components/TweetCard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DialogContent } from "@radix-ui/react-dialog";
+import { useGetFeedTweetsQuery } from "@/services/tweetAPI";
 
 const Home = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const { infiniteScroll, page } = useContext(AppContext);
+  const { page, tweetBoxType, hasNextPage } = useSelector(
+    (store) => store.tweet
+  );
+  const { isLoading, isError, data, error } = useGetFeedTweetsQuery();
 
-  const [progress, setProgress] = useState(0);
-  const [tweets, setTweets] = useState([]);
+  const { user } = useSelector((store) => store.auth);
 
-  const getFeedTweets = async () => {
-    setLoading(true);
-    setProgress(progress + 30);
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/tweet?page=${page}&limit=20`,
-        { withCredentials: true }
-      );
-      setTweets((prev) => [...prev, ...response.data.data.tweets]);
-      setLoading(false);
-      setProgress(progress + 100);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-      setProgress(progress + 100);
-    }
+  const dispatch = useDispatch();
+
+  const handleFetchData = () => {
+    dispatch(setPage());
+    console.log(page);
   };
 
-  useEffect(() => {
-    getFeedTweets();
-  }, [page]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", infiniteScroll);
-    return () => window.removeEventListener("scroll", infiniteScroll);
-  }, []);
-
-  return (
-    <>
-      <TweetBox />
-      {tweets.map((tweet, index) => (
-        <TweetCard key={index} tweet={tweet} setTweets={setTweets} />
-      ))}
-    </>
-  );
+  if (isLoading) {
+    return <Spinner />;
+  } else {
+    return (
+      <>
+        <div className="flex justify-between">
+          <Avatar>
+            <AvatarImage src={user.avatar} />
+            <AvatarFallback>
+              {user.username.split("")[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <Dialog>
+            <DialogTrigger asChild>
+              <p
+                onClick={() => dispatch(setTweetBoxType("createTweet"))}
+                className="self-center"
+              >
+                start a thread
+              </p>
+            </DialogTrigger>
+            <DialogContent>
+              <TweetBox formType={tweetBoxType} />
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Post</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <TweetBox formType={tweetBoxType} />
+            </DialogContent>
+          </Dialog>
+        </div>
+        {isError && <div>{error}</div>}
+        <InfiniteScroll
+          dataLength={data.length}
+          next={handleFetchData}
+          hasMore={hasNextPage}
+          loader={<Spinner className="text-center" />}
+        >
+          {data.length > 0 ? (
+            data.map((tweet, index) => (
+              <TweetCard type="HomeCommentOnTweet" key={index} tweet={tweet} />
+            ))
+          ) : (
+            <h3
+              className={` ${
+                isLoading && "hidden"
+              } block text-md  justify-center items-center h-screen `}
+            >
+              be the first to make a tweet
+            </h3>
+          )}
+        </InfiniteScroll>
+      </>
+    );
+  }
 };
 
 export default Home;

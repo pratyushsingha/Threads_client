@@ -1,42 +1,43 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Spinner, TweetCard, useToast } from "@/components/Index";
+import { useEffect } from "react";
+import { Spinner } from "@/components/Index";
+import { useSelector } from "react-redux";
+import TweetCard from "@/components/TweetCard";
+import { useParams } from "react-router-dom";
+import {
+  useLazyGetMyTweetsQuery,
+  useLazyGetPublicTweetsQuery,
+} from "@/services/tweetAPI";
 
 const Tweets = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [tweets, setTweets] = useState([]);
-
-  const userTweets = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/tweet/my`,
-        {
-          withCredentials: true,
-        }
-      );
-      setTweets(response.data.data);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-      setLoading(false);
-    }
-  };
+  const { username } = useParams();
+  const [
+    myTweetsTrigger,
+    { data: myTweets, isLoading: myTweetsLoading, error: myTweetsError },
+  ] = useLazyGetMyTweetsQuery();
+  const [
+    publicTweetsTrigger,
+    {
+      data: publicTweets,
+      isLoading: publicTweetsLoading,
+      error: publicTweetsError,
+    },
+  ] = useLazyGetPublicTweetsQuery();
+  const { user } = useSelector((store) => store.auth);
 
   useEffect(() => {
-    userTweets();
+    if (username == user.username) {
+      myTweetsTrigger(username);
+    } else {
+      publicTweetsTrigger(username);
+    }
   }, []);
 
-  loading && <Spinner />;
+  if (myTweetsLoading || publicTweetsLoading) return <Spinner />;
+  if (myTweetsError || publicTweetsError) return <p>something went wrong</p>;
+  const tweets = username === user.username ? myTweets : publicTweets;
 
-  return tweets.map((tweet) => (
-    <TweetCard tweet={tweet} setTweets={setTweets} />
+  return tweets?.map((tweet) => (
+    <TweetCard type="HomeCommentOnTweet" key={tweet._id} tweet={tweet} />
   ));
 };
 

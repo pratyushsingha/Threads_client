@@ -1,34 +1,30 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import {
-  AppContext,
-  Button,
-  Label,
-  Separator,
-  useToast,
-  Switch,
-} from "./Index";
+import { Button, Label, Separator, useToast, Switch, Spinner } from "./Index";
 import { Hash, Image, SmilePlus } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
-import axios from "axios";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { useCreateTweetMutation } from "@/services/tweetAPI";
+import { useReplyOnTweetMutation } from "@/services/replyAPI";
 
-const TweetBox = () => {
+const TweetBox = ({ formType, id }) => {
   const { toast } = useToast();
-  const { currentUserDetails, setLoading } = useContext(AppContext);
   const [openImoji, setOpenImoji] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [tagClick, setTagClick] = useState(false);
   const [previewImages, setPreviewImages] = useState([]);
   const [multipleImages, setMultipleImages] = useState();
+  const [loading, setLoading] = useState(false);
+  const { user } = useSelector((store) => store.auth);
+  const { tweetBoxType } = useSelector((store) => store.tweet);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty, isTouched, isSubmitSuccessful },
+    formState: { isDirty, isTouched, isSubmitSuccessful },
     reset,
   } = useForm({
     defaultValues: {
@@ -37,6 +33,9 @@ const TweetBox = () => {
       images: [],
     },
   });
+
+  const [createTweet, { isLoading: isCreating }] = useCreateTweetMutation();
+  const [replyOnTweet, { isLoading: isPosting }] = useReplyOnTweetMutation(id);
 
   const handleMultipleImages = (e) => {
     if (e.target.files) {
@@ -63,38 +62,6 @@ const TweetBox = () => {
     }
   };
 
-  const createTweet = async (data) => {
-    setLoading(true);
-    try {
-      const formdata = new FormData();
-      formdata.append("content", data.content);
-      formdata.append("tags", data.tags);
-      formdata.append("isAnonymous", isAnonymous);
-      for (let i = 0; i < data.images.length; i++) {
-        formdata.append("images", data.images[i]);
-      }
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/tweet`,
-        formdata,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(data);
-      toast({
-        title: response.data.message,
-      });
-      setLoading(false);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
-
   const render = (data) => {
     return (
       <div className="mb-4 grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
@@ -113,15 +80,52 @@ const TweetBox = () => {
         images: [],
       });
   }, [isSubmitSuccessful]);
+
+  const handleCreateTweet = async (data) => {
+    try {
+      await createTweet({ ...data, isAnonymous }).unwrap();
+      toast({
+        title: "Tweet created",
+      });
+    } catch (error) {
+      console.error("Error creating tweet:", error);
+    }
+  };
+
+  const handleReplyOnTweet = async (data) => {
+    try {
+      await replyOnTweet({
+        data: { ...data, isAnonymous },
+        tweetId: id,
+      }).unwrap();
+      toast({
+        title: "reply posted",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "something went wrong while repling on tweet",
+      });
+    }
+  };
+
+  const submitHandler = (data) => {
+    if (tweetBoxType === "createTweet") {
+      handleCreateTweet(data);
+    } else if (tweetBoxType === "replyOnTweet") {
+      handleReplyOnTweet(data);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(createTweet)}>
+    <form onSubmit={handleSubmit(submitHandler)}>
       <div className="relative flex-col border-slate border-2 rounded px-2 py-2 my-4">
         <div className="flex space-x-5 w-full ">
           <div className="self-center">
-            <Link to={`/profile/${currentUserDetails.username}`}>
+            <Link to={`/profile/${user.username}`}>
               <img
                 className="h-10 w-10 shrink-0 sm:h-12 sm:w-12 rounded-full"
-                src={currentUserDetails.avatar}
+                src={user.avatar}
                 alt=""
               />
             </Link>
@@ -184,6 +188,10 @@ const TweetBox = () => {
             </Button>
           </div>
           <Button disabled={!isDirty && !isTouched} type="submit">
+            {isCreating ||
+              (isPosting && (
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              ))}
             Post
           </Button>
         </div>

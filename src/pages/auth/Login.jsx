@@ -1,5 +1,4 @@
-import { useContext, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,11 +18,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { AppContext } from "@/context/AppContext";
 import { Separator } from "@/components/ui/separator";
 import Container from "@/components/Container";
 import InputDiv from "@/components/InputDiv";
 import { Checkbox } from "@/components/Index";
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "@/services/authAPI";
 
 const loginSchema = z.object({
   username: z
@@ -40,9 +40,7 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(null);
-  const [loader, setLoader] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
-  const { progress, setProgress } = useContext(AppContext);
+  const [login, { isLoading }] = useLoginMutation();
 
   const {
     register,
@@ -56,39 +54,20 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const loginUser = async (data) => {
-    setLoader(true);
-    setProgress(progress + 30);
+  const handleLogin = async (data) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/users/login`,
-        {
-          username: data.username,
-          password: data.password,
-        },
-        { withCredentials: true }
-      );
-      if (rememberMe === true) {
-        localStorage.setItem("accessToken", response.data.data.accessToken);
-        console.log(rememberMe);
-      }
-      toast({
-        title: "success",
-        description: `welcome back ${response.data.data.user.username}`,
-      });
+      const response = await login(data).unwrap();
+      localStorage.setItem("token", response.data.accessToken);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       navigate("/");
-
-      setLoader(false);
-      setProgress(100);
+      toast({
+        title: `Welcome back ${data.username}`,
+      });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
+        title: error.data.message,
       });
-      // console.log(error);
-      setLoader(false);
-      setProgress(progress + 100);
     }
   };
 
@@ -100,7 +79,7 @@ const Login = () => {
           <CardDescription>Sign in to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-5" onSubmit={handleSubmit(loginUser)}>
+          <form className="space-y-5" onSubmit={handleSubmit(handleLogin)}>
             <InputDiv
               label="username"
               placeholder="enter your username"
@@ -154,7 +133,9 @@ const Login = () => {
             </div>
             <div>
               <Button disabled={isSubmitting} className="w-full">
-                {loader && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading && (
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 login
               </Button>
             </div>

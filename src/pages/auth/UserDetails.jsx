@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,19 +9,18 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 import { passwordStrength } from "check-password-strength";
 
 import {
-  AppContext,
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
   useToast,
   InputDiv,
   Button,
-  Label,
   PassStrengthBar,
+  Spinner,
 } from "@/components/Index";
+import { useDispatch, useSelector } from "react-redux";
 
 const profileSchema = z.object({
   firstName: z.string().nonempty("First name is required"),
@@ -47,11 +46,11 @@ const passwordSchema = z.object({
     ),
 });
 
-const UpdateUserDetails = () => {
+const UpdateUserDetails = ({ user }) => {
   const { toast } = useToast();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  const { currentUserDetails, currentUser } = useContext(AppContext);
   const {
     register,
     handleSubmit,
@@ -69,12 +68,12 @@ const UpdateUserDetails = () => {
   });
 
   const userOldDetails = () => {
-    setValue("firstName", currentUserDetails.fullName.split(" ")[0]);
-    setValue("lastName", currentUserDetails.fullName.split(" ")[1]);
-    setValue("email", currentUserDetails.email);
-    setValue("tags", currentUserDetails.tags);
-    setValue("bio", currentUserDetails.bio);
-    setValue("portfolio", currentUserDetails.portfolio);
+    setValue("firstName", user.fullName.split(" ")[0]);
+    setValue("lastName", user.fullName.split(" ")[1]);
+    setValue("email", user.email);
+    setValue("tags", user.tags);
+    setValue("bio", user.bio);
+    setValue("portfolio", user.portfolio);
   };
   const updateProfile = async (data) => {
     setLoading(true);
@@ -88,7 +87,6 @@ const UpdateUserDetails = () => {
         },
         { withCredentials: true }
       );
-      // console.log(response);
       toast({
         title: "success",
         description: `${response.data.message}`,
@@ -98,7 +96,7 @@ const UpdateUserDetails = () => {
       console.log(error);
       toast({
         title: "error",
-        description: `${error.message}`,
+        description: `${error.response.data.message}`,
       });
     }
     setLoading(false);
@@ -109,7 +107,7 @@ const UpdateUserDetails = () => {
   }, []);
 
   useEffect(() => {
-    isSubmitSuccessful && currentUser();
+    isSubmitSuccessful && dispatch(getUserDetails(user.username));
   }, [isSubmitSuccessful]);
 
   return (
@@ -169,10 +167,10 @@ const UpdateUserDetails = () => {
   );
 };
 
-const UpdateAvatar = () => {
-  const { currentUserDetails, currentUser } = useContext(AppContext);
+const UpdateAvatar = ({ user }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -192,14 +190,11 @@ const UpdateAvatar = () => {
     try {
       const formData = new FormData();
       formData.append("avatar", data.avatar[0]);
-      console.log(data);
-      const response = await axios.patch(
+      await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/users/avatar`,
         formData,
         { withCredentials: true }
       );
-      currentUser();
-      // console.log(response);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -211,14 +206,13 @@ const UpdateAvatar = () => {
     if (avatar) {
       const imageUrl = URL.createObjectURL(avatar[0]);
       setPreviewImage(imageUrl);
-      // console.log(avatar[0], imageUrl);
     } else {
-      setPreviewImage(currentUserDetails.avatar);
+      setPreviewImage(user.avatar);
     }
   }, [avatar]);
 
   useEffect(() => {
-    isSubmitSuccessful && currentUser();
+    isSubmitSuccessful && dispatch(getUserDetails(user.username));
   }, [isSubmitSuccessful]);
 
   return (
@@ -243,10 +237,11 @@ const UpdateAvatar = () => {
   );
 };
 
-const UpdateCoverImage = () => {
+const UpdateCoverImage = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [previewCoverImage, setPreviewCoverImage] = useState(null);
-  const { currentUser, currentUserDetails } = useContext(AppContext);
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -264,12 +259,11 @@ const UpdateCoverImage = () => {
     try {
       const formData = new FormData();
       formData.append("coverImage", data.coverImage[0]);
-      const response = await axios.patch(
+      await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/users/coverimage`,
         formData,
         { withCredentials: true }
       );
-      currentUser();
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -282,12 +276,12 @@ const UpdateCoverImage = () => {
       const imageUrl = URL.createObjectURL(coverImage[0]);
       setPreviewCoverImage(imageUrl);
     } else {
-      setPreviewCoverImage(currentUserDetails.coverImage);
+      setPreviewCoverImage(user.coverImage);
     }
   }, [coverImage]);
 
   useEffect(() => {
-    isSubmitSuccessful && currentUser();
+    isSubmitSuccessful && dispatch(getUserDetails(user.username));
   }, [isSubmitSuccessful]);
 
   return (
@@ -353,7 +347,7 @@ const UpdatePassword = () => {
       toast({
         variant: "destructive",
         title: "error",
-        description: `${error.message}`,
+        description: `${error.response.data.message}`,
       });
 
       setLoading(false);
@@ -432,16 +426,17 @@ const UpdatePassword = () => {
 };
 
 const UserDetails = () => {
+  const { user } = useSelector((store) => store.auth);
   return (
     <>
-      <UpdateUserDetails />
+      <UpdateUserDetails user={user} />
       <Card>
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
         </CardHeader>
         <CardDescription>
-          <UpdateAvatar />
-          <UpdateCoverImage />
+          <UpdateAvatar user={user} />
+          <UpdateCoverImage user={user} />
         </CardDescription>
       </Card>
       <UpdatePassword />

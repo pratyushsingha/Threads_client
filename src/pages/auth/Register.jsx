@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { passwordStrength } from "check-password-strength";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   Card,
@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import PassStrengthBar from "@/components/PaawordStrengthBar";
 import Container from "@/components/Container";
 import InputDiv from "@/components/InputDiv";
-import { AppContext } from "@/context/AppContext";
 import { useToast } from "@/components/ui/use-toast";
 
 const registerSchema = z
@@ -52,6 +51,7 @@ const registerSchema = z
 
 const Register = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -70,13 +70,11 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passStrength, setPassStrength] = useState(-1);
   const [loader, setLoader] = useState(false);
-  const { progress, setProgress } = useContext(AppContext);
+  // const { progress, setProgress } = useContext(AppContext);
 
   const registerUser = async (data) => {
     setLoader(true);
-    setProgress(progress + 30);
     try {
-      // console.log(import.meta.env.VITE_BACKEND_URL)
       const formData = new FormData();
       formData.append("email", data.email);
       formData.append("password", data.password);
@@ -93,11 +91,12 @@ const Register = () => {
         }
       );
       setLoader(false);
-      setProgress(progress + 100);
+      // setProgress(progress + 100);
       toast({
         title: "success",
         description: `welcome ${response.data.data.username}`,
       });
+      navigate("/login");
       // console.log(response);
     } catch (error) {
       toast({
@@ -107,7 +106,7 @@ const Register = () => {
       });
       // console.log(error);
       setLoader(false);
-      setProgress(progress + 100);
+      // setProgress(progress + 100);
     }
   };
   return (

@@ -1,58 +1,21 @@
-import { Spinner, TweetCard, useToast } from "@/components/Index";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { Spinner } from "@/components/Index";
+import TweetCard from "@/components/TweetCard";
+import { useGetLikedTweetsQuery } from "@/services/tweetAPI";
 
 const LikedTweets = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [tweets, setTweets] = useState([]);
+  const { data: likedTweets, isLoading, isError } = useGetLikedTweetsQuery();
 
-  const userTweets = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/like/tweets`,
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(response);
-      setTweets(response.data.data[0].likedTweets);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "error",
-        description: `${error.message}`,
-      });
-      setLoading(false);
-    }
-  };
+  if (isLoading) return <Spinner />;
 
-  const removeFromLikes = (tweetId) => {
-    setTweets((prevTweets) =>
-      prevTweets.filter((tweet) => tweet._id !== tweetId)
-    );
-    toast({
-      title: "Removed from your likes",
-    });
-  };
+  if (isError) return <p>something went wrong</p>;
 
-  useEffect(() => {
-    userTweets();
-  }, []);
-
-  loading && <Spinner />;
-
-  return tweets.map((tweet) => (
-    <TweetCard
-      key={tweet._id}
-      tweet={tweet}
-      setTweets={setTweets}
-      removeFromLikes={removeFromLikes}
-    />
-  ));
+  return likedTweets.length > 0 ? (
+    likedTweets[0].likedTweets.map((tweet) => (
+      <TweetCard type="HomeCommentOnTweet" key={tweet._id} tweet={tweet} />
+    ))
+  ) : (
+    <p>be the first to add a tweet</p>
+  );
 };
 
 export default LikedTweets;
