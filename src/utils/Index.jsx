@@ -35,12 +35,35 @@ export const profileRoutes = [
   },
   {
     _id: 2,
-    title: "Liked Tweets",
-    path: "likedTweets",
+    title: "Replies",
+    path: "replies",
   },
   {
     _id: 3,
-    title: "Bookmarked Tweets",
-    path: "bookmarkedTweets",
+    title: "Reposts",
+    path: "reposts",
+  },
+];
+
+export const homeRoutes = [
+  {
+    _id: 1,
+    title: "For you",
+    path: "",
+  },
+  {
+    _id: 2,
+    title: "Follwing",
+    path: "following",
+  },
+  {
+    _id: 3,
+    title: "Liked",
+    path: "liked",
+  },
+  {
+    _id: 1,
+    title: "Saved",
+    path: "saved",
   },
 ];

@@ -22,19 +22,6 @@ import {
 } from "@/components/Index";
 import { useDispatch, useSelector } from "react-redux";
 
-const profileSchema = z.object({
-  firstName: z.string().nonempty("First name is required"),
-  lastName: z.string().nonempty("Last name is required"),
-  tags: z
-    .string()
-    .regex(
-      /^#[^\s#]+(?:\s+#[^\s#]+)*$/,
-      "Tags should be formatted as '#tag1 #tag2 #tag3' with each tag starting with '#' and separated by spaces"
-    ),
-  bio: z.string(),
-  portfolio: z.string().url("Portfolio must be a valid URL"),
-});
-
 const passwordSchema = z.object({
   oldPassword: z.string().nonempty("old password is required"),
   newPassword: z
@@ -50,22 +37,6 @@ const UpdateUserDetails = ({ user }) => {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isTouched, isSubmitting, isSubmitSuccessful },
-    setValue,
-  } = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      tags: "",
-      bio: "",
-      portfolio: "",
-    },
-    resolver: zodResolver(profileSchema),
-  });
 
   const userOldDetails = () => {
     setValue("firstName", user.fullName.split(" ")[0]);
@@ -110,201 +81,147 @@ const UpdateUserDetails = ({ user }) => {
     isSubmitSuccessful && dispatch(getUserDetails(user.username));
   }, [isSubmitSuccessful]);
 
-  return (
-    <div className="flex flex-col justify-center items-center">
-      <Card className="w-[500px]">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">My profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit(updateProfile)}>
-            <InputDiv
-              label="First Name"
-              placeholder="enter your first name"
-              {...register("firstName")}
-            />
-            <p className="text-red-600">{errors.firstName?.message}</p>
-            <InputDiv
-              label="Last Name"
-              placeholder="enter your last name"
-              {...register("lastName")}
-            />
-            <p className="text-red-600">{errors.lastName?.message}</p>
-            <InputDiv
-              label="Tags"
-              placeholder="enter tags"
-              {...register("tags")}
-            />
-            <p className="text-red-600">{errors.tags?.message}</p>
-            <InputDiv
-              label="Bio"
-              placeholder="enter your bio"
-              {...register("bio")}
-            />
-            <p className="text-red-600">{errors.bio?.message}</p>
-            <InputDiv
-              label="Portfolio"
-              type="url"
-              placeholder="enter your portfolio"
-              {...register("portfolio")}
-            />
-            <p className="text-red-600">{errors.portfolio?.message}</p>
-            <div>
-              <Button
-                disabled={isSubmitting || (!isDirty && !isTouched)}
-                className="w-full"
-              >
-                {loading && (
-                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Update
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return s;
 };
 
-const UpdateAvatar = ({ user }) => {
-  const [previewImage, setPreviewImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+// const UpdateAvatar = ({ user }) => {
+//   const [previewImage, setPreviewImage] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const dispatch = useDispatch();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isTouched, isSubmitSuccessful },
-    watch,
-  } = useForm({
-    defaultValues: {
-      avatar: "",
-    },
-  });
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors, isDirty, isTouched, isSubmitSuccessful },
+//     watch,
+//   } = useForm({
+//     defaultValues: {
+//       avatar: "",
+//     },
+//   });
 
-  const { avatar } = watch();
+//   const { avatar } = watch();
 
-  const updateAvatar = async (data) => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("avatar", data.avatar[0]);
-      await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/users/avatar`,
-        formData,
-        { withCredentials: true }
-      );
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
+//   const updateAvatar = async (data) => {
+//     setLoading(true);
+//     try {
+//       const formData = new FormData();
+//       formData.append("avatar", data.avatar[0]);
+//       await axios.patch(
+//         `${import.meta.env.VITE_BACKEND_URL}/users/avatar`,
+//         formData,
+//         { withCredentials: true }
+//       );
+//       setLoading(false);
+//     } catch (error) {
+//       console.log(error);
+//       setLoading(false);
+//     }
+//   };
 
-  useEffect(() => {
-    if (avatar) {
-      const imageUrl = URL.createObjectURL(avatar[0]);
-      setPreviewImage(imageUrl);
-    } else {
-      setPreviewImage(user.avatar);
-    }
-  }, [avatar]);
+//   useEffect(() => {
+//     if (avatar) {
+//       const imageUrl = URL.createObjectURL(avatar[0]);
+//       setPreviewImage(imageUrl);
+//     } else {
+//       setPreviewImage(user.avatar);
+//     }
+//   }, [avatar]);
 
-  useEffect(() => {
-    isSubmitSuccessful && dispatch(getUserDetails(user.username));
-  }, [isSubmitSuccessful]);
+//   useEffect(() => {
+//     isSubmitSuccessful && dispatch(getUserDetails(user.username));
+//   }, [isSubmitSuccessful]);
 
-  return (
-    <>
-      <form onSubmit={handleSubmit(updateAvatar)}>
-        <input
-          accept="image/png, image/jpg, image/jpeg"
-          type="file"
-          {...register("avatar")}
-        />
-        {loading && <Spinner />}
-        {previewImage && <img src={previewImage} alt="Preview" />}
-        <p className="text-red-600">{errors.avatar?.message}</p>
-        <Button
-          type="submit"
-          disabled={isSubmitSuccessful || (!isDirty && !isTouched)}
-        >
-          Update
-        </Button>
-      </form>
-    </>
-  );
-};
+//   return (
+//     <>
+//       <form onSubmit={handleSubmit(updateAvatar)}>
+//         <input
+//           accept="image/png, image/jpg, image/jpeg"
+//           type="file"
+//           {...register("avatar")}
+//         />
+//         {loading && <Spinner />}
+//         {previewImage && <img src={previewImage} alt="Preview" />}
+//         <p className="text-red-600">{errors.avatar?.message}</p>
+//         <Button
+//           type="submit"
+//           disabled={isSubmitSuccessful || (!isDirty && !isTouched)}
+//         >
+//           Update
+//         </Button>
+//       </form>
+//     </>
+//   );
+// };
 
-const UpdateCoverImage = ({ user }) => {
-  const [loading, setLoading] = useState(false);
-  const [previewCoverImage, setPreviewCoverImage] = useState(null);
-  const dispatch = useDispatch();
+// const UpdateCoverImage = ({ user }) => {
+//   const [loading, setLoading] = useState(false);
+//   const [previewCoverImage, setPreviewCoverImage] = useState(null);
+//   const dispatch = useDispatch();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isTouched, isSubmitSuccessful },
-    watch,
-  } = useForm({
-    defaultValues: {
-      coverImage: "",
-    },
-  });
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors, isDirty, isTouched, isSubmitSuccessful },
+//     watch,
+//   } = useForm({
+//     defaultValues: {
+//       coverImage: "",
+//     },
+//   });
 
-  const { coverImage } = watch();
-  const updateCoverImage = async (data) => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("coverImage", data.coverImage[0]);
-      await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/users/coverimage`,
-        formData,
-        { withCredentials: true }
-      );
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
+//   const { coverImage } = watch();
+//   const updateCoverImage = async (data) => {
+//     setLoading(true);
+//     try {
+//       const formData = new FormData();
+//       formData.append("coverImage", data.coverImage[0]);
+//       await axios.patch(
+//         `${import.meta.env.VITE_BACKEND_URL}/users/coverimage`,
+//         formData,
+//         { withCredentials: true }
+//       );
+//       setLoading(false);
+//     } catch (error) {
+//       console.log(error);
+//       setLoading(false);
+//     }
+//   };
 
-  useEffect(() => {
-    if (coverImage) {
-      const imageUrl = URL.createObjectURL(coverImage[0]);
-      setPreviewCoverImage(imageUrl);
-    } else {
-      setPreviewCoverImage(user.coverImage);
-    }
-  }, [coverImage]);
+//   useEffect(() => {
+//     if (coverImage) {
+//       const imageUrl = URL.createObjectURL(coverImage[0]);
+//       setPreviewCoverImage(imageUrl);
+//     } else {
+//       setPreviewCoverImage(user.coverImage);
+//     }
+//   }, [coverImage]);
 
-  useEffect(() => {
-    isSubmitSuccessful && dispatch(getUserDetails(user.username));
-  }, [isSubmitSuccessful]);
+//   useEffect(() => {
+//     isSubmitSuccessful && dispatch(getUserDetails(user.username));
+//   }, [isSubmitSuccessful]);
 
-  return (
-    <>
-      <form onSubmit={handleSubmit(updateCoverImage)}>
-        <input
-          accept="image/png, image/jpg, image/jpeg"
-          type="file"
-          {...register("coverImage")}
-        />
-        {loading && <Spinner />}
-        {previewCoverImage && <img src={previewCoverImage} alt="Preview" />}
-        <p className="text-red-600">{errors.coverImage?.message}</p>
-        <Button
-          type="submit"
-          disabled={isSubmitSuccessful || (!isDirty && !isTouched)}
-        >
-          Update
-        </Button>
-      </form>
-    </>
-  );
-};
+//   return (
+//     <>
+//       <form onSubmit={handleSubmit(updateCoverImage)}>
+//         <input
+//           accept="image/png, image/jpg, image/jpeg"
+//           type="file"
+//           {...register("coverImage")}
+//         />
+//         {loading && <Spinner />}
+//         {previewCoverImage && <img src={previewCoverImage} alt="Preview" />}
+//         <p className="text-red-600">{errors.coverImage?.message}</p>
+//         <Button
+//           type="submit"
+//           disabled={isSubmitSuccessful || (!isDirty && !isTouched)}
+//         >
+//           Update
+//         </Button>
+//       </form>
+//     </>
+//   );
+// };
 
 const UpdatePassword = () => {
   const { toast } = useToast();
@@ -429,7 +346,7 @@ const UserDetails = () => {
   const { user } = useSelector((store) => store.auth);
   return (
     <>
-      <UpdateUserDetails user={user} />
+      {/* <UpdateUserDetails user={user} />
       <Card>
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
@@ -439,7 +356,7 @@ const UserDetails = () => {
           <UpdateCoverImage user={user} />
         </CardDescription>
       </Card>
-      <UpdatePassword />
+      <UpdatePassword /> */}
     </>
   );
 };

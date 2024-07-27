@@ -6,11 +6,22 @@ export const followApi = createApi({
     baseUrl: import.meta.env.VITE_BACKEND_URL,
     credentials: "include",
   }),
+  tagTypes: ["userProfile"],
   endpoints: (builder) => ({
     getUserProfileDetails: builder.query({
+      providesTags: ["userProfile"],
       query: (username) => `/users/profile/u/${username}`,
       transformResponse: (response) => response.data,
     }),
+    updateUserDetails: builder.mutation({
+      query: (data) => ({
+        url: `/users/profile`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["userProfile"],
+    }),
+
     handleFollow: builder.mutation({
       query: ({ followerId }) => ({
         url: `/follow/${followerId}`,
@@ -42,5 +53,8 @@ export const followApi = createApi({
   }),
 });
 
-export const { useGetUserProfileDetailsQuery, useHandleFollowMutation } =
-  followApi;
+export const {
+  useGetUserProfileDetailsQuery,
+  useHandleFollowMutation,
+  useUpdateUserDetailsMutation,
+} = followApi;

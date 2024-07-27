@@ -21,13 +21,32 @@ import { store } from "./store/store";
 import CommentDetails from "./pages/CommentDetails";
 import RepostPage from "./pages/RepostPage";
 import RepliedTweetsPage from "./pages/RepliedTweetsPage";
+import ErrorPage from "./pages/ErrorPage";
+import FeedPage from "./pages/FeedPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AuthLayout />,
     children: [
-      { path: "/", element: <Home /> },
+      {
+        path: "/",
+        element: <Home />,
+        children: [
+          {
+            path: "/",
+            element: <FeedPage />,
+          },
+          {
+            path: "/liked",
+            element: <LikedTweets />,
+          },
+          {
+            path: "/saved",
+            element: <BookmarkedTweets />,
+          },
+        ],
+      },
       { path: "/tweet/:id", element: <TweetDetails /> },
       {
         path: "/profile/:username",
@@ -46,6 +65,10 @@ const router = createBrowserRouter([
             element: <RepliedTweetsPage />,
           },
         ],
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,
       },
     ],
   },

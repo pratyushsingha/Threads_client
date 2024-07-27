@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setPage, setTweetBoxType } from "@/features/tweetSlice";
+import { setHomeRoute, setPage, setTweetBoxType } from "@/features/tweetSlice";
 import {
   TweetBox,
   Spinner,
@@ -7,87 +7,91 @@ import {
   Button,
   Dialog,
   DialogTrigger,
-  DialogHeader,
+  DialogContent,
 } from "@/components/Index";
-import InfiniteScroll from "react-infinite-scroll-component";
-import TweetCard from "@/components/TweetCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DialogContent } from "@radix-ui/react-dialog";
-import { useGetFeedTweetsQuery } from "@/services/tweetAPI";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CiCircleChevDown } from "react-icons/ci";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { homeRoutes } from "@/utils/Index";
+import FeedPage from "./FeedPage";
+import { useEffect } from "react";
 
 const Home = () => {
-  const { page, tweetBoxType, hasNextPage } = useSelector(
-    (store) => store.tweet
-  );
-  const { isLoading, isError, data, error } = useGetFeedTweetsQuery();
+  const location = useLocation();
+  const { tweetBoxType } = useSelector((store) => store.tweet);
 
   const { user } = useSelector((store) => store.auth);
+  const { homeRoute } = useSelector((store) => store.tweet);
 
   const dispatch = useDispatch();
 
-  const handleFetchData = () => {
-    dispatch(setPage());
-    console.log(page);
-  };
+  useEffect(() => {
+    if (location.pathname === "/") {
+      dispatch(setHomeRoute("For You"));
+    } else {
+      dispatch(setHomeRoute(location.pathname.split("/").pop()));
+    }
+  }, [location]);
 
-  if (isLoading) {
-    return <Spinner />;
-  } else {
-    return (
-      <>
-        <div className="flex justify-between">
-          <Avatar>
-            <AvatarImage src={user.avatar} />
-            <AvatarFallback>
-              {user.username.split("")[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <Dialog>
-            <DialogTrigger asChild>
-              <p
-                onClick={() => dispatch(setTweetBoxType("createTweet"))}
-                className="self-center"
-              >
-                start a thread
-              </p>
-            </DialogTrigger>
-            <DialogContent>
-              <TweetBox formType={tweetBoxType} />
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Post</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <TweetBox formType={tweetBoxType} />
-            </DialogContent>
-          </Dialog>
-        </div>
-        {isError && <div>{error}</div>}
-        <InfiniteScroll
-          dataLength={data.length}
-          next={handleFetchData}
-          hasMore={hasNextPage}
-          loader={<Spinner className="text-center" />}
-        >
-          {data.length > 0 ? (
-            data.map((tweet, index) => (
-              <TweetCard type="HomeCommentOnTweet" key={index} tweet={tweet} />
-            ))
-          ) : (
-            <h3
-              className={` ${
-                isLoading && "hidden"
-              } block text-md  justify-center items-center h-screen `}
+  return (
+    <>
+      <div className="flex justify-center items-center space-x-2">
+        <span className="font-bold text-xl">{homeRoute}</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button variant="ghost">
+              <CiCircleChevDown className="text-2xl" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {homeRoutes.map((item) => (
+              <Link to={`${item.path}`} key={item._id}>
+                <DropdownMenuItem>{item.title} </DropdownMenuItem>
+              </Link>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex justify-between">
+        <Avatar>
+          <AvatarImage src={user.avatar} />
+          <AvatarFallback>
+            {user.username.split("")[0].toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <Dialog>
+          <DialogTrigger asChild>
+            <p
+              onClick={() => dispatch(setTweetBoxType("createTweet"))}
+              className="self-center"
             >
-              be the first to make a tweet
-            </h3>
-          )}
-        </InfiniteScroll>
-      </>
-    );
-  }
+              start a thread
+            </p>
+          </DialogTrigger>
+          <DialogContent>
+            <TweetBox formType={tweetBoxType} />
+          </DialogContent>
+        </Dialog>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Post</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <TweetBox formType={tweetBoxType} />
+          </DialogContent>
+        </Dialog>
+      </div>
+      <Outlet />
+    </>
+  );
 };
 
 export default Home;
