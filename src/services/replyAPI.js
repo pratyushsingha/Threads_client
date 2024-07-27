@@ -47,21 +47,39 @@ export const replyApi = createApi({
             })
           ),
           dispatch(
-            replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              draft.push({
-                ...data,
-                ownerDetails: getState().auth.user,
-                updatedAt: new Date().toISOString(),
-                commentCount: 0,
-                likeCount: 0,
-                isLiked: false,
-                _id: Math.random().toString(),
-              });
-              draft.forEach((reply) => {
-                if (reply.tweetId === tweetId) {
-                  reply.commentCount += 1;
+            replyApi.util.updateQueryData(
+              "getRepliedTweets",
+              username,
+              (draft) => {
+                const tweet = draft.find((tweet) => tweet._id === tweetId);
+                if (tweet) {
+                  tweet.commentCount += 1;
+                } else {
+                  const reply = draft.find(
+                    (reply) => reply.tweetId === tweetId
+                  );
+                  if (reply) {
+                    reply.tweetDetails.commentCount += 1;
+                  }
                 }
-              });
+              }
+            )
+          ),
+          dispatch(
+            replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
+              // draft.push({
+              //   ...data,
+              //   ownerDetails: getState().auth.user,
+              //   updatedAt: new Date().toISOString(),
+              //   commentCount: 0,
+              //   likeCount: 0,
+              //   isLiked: false,
+              //   _id: Math.random().toString(),
+              // });
+              const tweet = draft.find((tweet) => tweet._id === tweetId);
+              if (tweet) {
+                tweet.commentCount += 1;
+              }
             })
           ),
           dispatch(
@@ -89,16 +107,12 @@ export const replyApi = createApi({
             )
           ),
           dispatch(
-            tweetApi.util.updateQueryData(
-              "getMyTweets",
-              username,
-              (draft) => {
-                const tweet = draft.find((tweet) => tweet._id === tweetId);
-                if (tweet) {
-                  tweet.commentCount += 1;
-                }
+            tweetApi.util.updateQueryData("getMyTweets", username, (draft) => {
+              const tweet = draft.find((tweet) => tweet._id === tweetId);
+              if (tweet) {
+                tweet.commentCount += 1;
               }
-            )
+            })
           ),
           dispatch(
             tweetApi.util.updateQueryData(

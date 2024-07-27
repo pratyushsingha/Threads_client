@@ -1,4 +1,5 @@
 import { Spinner } from "@/components/Index";
+import TweetCard from "@/components/TweetCard";
 import { useGetBookmarkedTweetsQuery } from "@/services/tweetAPI";
 
 const BookmarkedTweets = () => {

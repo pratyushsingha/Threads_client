@@ -24,6 +24,7 @@ import InputDiv from "@/components/InputDiv";
 import { Checkbox } from "@/components/Index";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "@/services/authAPI";
+import { setAuthState } from "@/features/authSlice";
 
 const loginSchema = z.object({
   username: z
@@ -39,6 +40,7 @@ const loginSchema = z.object({
 const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(null);
   const [login, { isLoading }] = useLoginMutation();
 
@@ -59,6 +61,12 @@ const Login = () => {
       const response = await login(data).unwrap();
       localStorage.setItem("token", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      dispatch(
+        setAuthState({
+          token: response.data.accessToken,
+          user: response.data.user,
+        })
+      );
       navigate("/");
       toast({
         title: `Welcome back ${data.username}`,

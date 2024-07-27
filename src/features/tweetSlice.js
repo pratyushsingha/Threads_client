@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   page: 1,
   tweetBoxType: "tweet",
+  homeRoute: "For You",
 };
 
 export const tweetSlice = createSlice({
@@ -15,9 +16,12 @@ export const tweetSlice = createSlice({
     setTweetBoxType: (state, { payload }) => {
       state.tweetBoxType = payload;
     },
+    setHomeRoute: (state, { payload }) => {
+      state.homeRoute = payload;
+    },
   },
 });
 
-export const { setPage, setTweetBoxType } = tweetSlice.actions;
+export const { setPage, setTweetBoxType, setHomeRoute } = tweetSlice.actions;
 
 export default tweetSlice.reducer;

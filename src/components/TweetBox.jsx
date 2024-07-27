@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Button, Label, Separator, useToast, Switch, Spinner } from "./Index";
+import {
+  Button,
+  Label,
+  Separator,
+  useToast,
+  Switch,
+  Spinner,
+  Input,
+} from "./Index";
 import { Hash, Image, SmilePlus } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { useForm } from "react-hook-form";
@@ -11,6 +19,7 @@ import { useCreateTweetMutation } from "@/services/tweetAPI";
 import { useReplyOnTweetMutation } from "@/services/replyAPI";
 
 const TweetBox = ({ formType, id }) => {
+  const imagesRef = useRef(null);
   const { toast } = useToast();
   const [openImoji, setOpenImoji] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -64,9 +73,9 @@ const TweetBox = ({ formType, id }) => {
 
   const render = (data) => {
     return (
-      <div className="mb-4 grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
+      <div className="mb-4 flex overflow-x-auto gap-4">
         {data.map((image, index) => (
-          <img key={index} src={image} alt={image} className="rounded-md" />
+          <img key={index} src={image} alt={image} className="rounded-md w-2/4 h-2/4" />
         ))}
       </div>
     );
@@ -157,16 +166,22 @@ const TweetBox = ({ formType, id }) => {
         <div className="mx-4 flex justify-between">
           <div>
             <Label htmlFor="imageUpload">
-              <Button type="button" variant="ghost">
+              <Button
+                onClick={() => imagesRef.current.click()}
+                type="button"
+                variant="ghost"
+              >
                 <Image color="#1a8cd8" />
               </Button>
             </Label>
-            <input
+            <Input
+              ref={imagesRef}
+              className="hidden"
               id="imageUpload"
               type="file"
               accept="image/png, image/jpg, image/jpeg"
               multiple
-              {...register("images")}
+              // {...register("images")}
               onChange={(e) => handleMultipleImages(e)}
             />
             <Button onClick={() => setOpenImoji(!openImoji)} variant="ghost">

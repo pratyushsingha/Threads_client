@@ -5,6 +5,7 @@ import { useGetLikedTweetsQuery } from "@/services/tweetAPI";
 const LikedTweets = () => {
   const { data: likedTweets, isLoading, isError } = useGetLikedTweetsQuery();
 
+
   if (isLoading) return <Spinner />;
 
   if (isError) return <p>something went wrong</p>;

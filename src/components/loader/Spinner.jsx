@@ -1,7 +1,11 @@
 import "./spinner.css";
 
 const Spinner = () => {
-  return <span className="loader"></span>;
+  return (
+    <section className="flex justify-center items-center">
+      <span className="loader"></span>;
+    </section>
+  );
 };
 
 export default Spinner;

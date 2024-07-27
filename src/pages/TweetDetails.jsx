@@ -27,7 +27,9 @@ const TweetDetails = () => {
 
   useEffect(() => {
     dispatch(setIdParams(id));
-  }, []);
+  }, [id, dispatch]);
+
+
 
   if (isTweetDetailsError)
     return <p>something went wrong while getting tweetDetils</p>;
@@ -52,6 +54,7 @@ const TweetDetails = () => {
         //   loader={<Spinner className="text-center" />}
         // >
         // {
+
         tweetReplies?.length > 0 ? (
           tweetReplies.map((comment) => (
             <CommentCard key={comment._id} comment={comment} />
