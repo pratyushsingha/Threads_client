@@ -21,7 +21,21 @@ export const authApi = createApi({
       providesTags: ["User"],
       transformResponse: (response) => response.data,
     }),
+    userSuggetions: builder.query({
+      query: () => "users/suggestions",
+      providesTags: ["User"],
+      transformResponse: (response) => response.data.users,
+    }),
+    searchUser: builder.query({
+      query: (data) => `/users/search?q=${data}`,
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
-export const { useLoginMutation, useGetCurrentUserQuery } = authApi;
+export const {
+  useLoginMutation,
+  useGetCurrentUserQuery,
+  useUserSuggetionsQuery,
+  useLazySearchUserQuery,
+} = authApi;

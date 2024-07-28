@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { authApi } from "./authAPI";
 
 export const followApi = createApi({
   reducerPath: "followApi",
@@ -28,21 +29,41 @@ export const followApi = createApi({
         method: "POST",
         body: {},
       }),
-      async onQueryStarted({ username }, { dispatch, queryFulfilled }) {
-        const patchUpdate = dispatch(
-          followApi.util.updateQueryData(
-            "getUserProfileDetails",
-            username,
-            (draft) => {
-              draft.isFollowing = !draft.isFollowing;
-              if (draft.isFollowing) {
-                draft.followersCount += 1;
-              } else {
-                draft.followersCount -= 1;
+      async onQueryStarted(
+        { username, searchQuery },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchUpdate = [
+          dispatch(
+            followApi.util.updateQueryData(
+              "getUserProfileDetails",
+              username,
+              (draft) => {
+                draft.isFollowing = !draft.isFollowing;
               }
-            }
-          )
-        );
+            )
+          ),
+          dispatch(
+            authApi.util.updateQueryData(
+              "userSuggetions",
+              undefined,
+              (draft) => {
+                const user = draft.find((user) => user.username === username);
+                if (user) {
+                  user.isFollowing = !user.isFollowing;
+                }
+              }
+            )
+          ),
+          dispatch(
+            authApi.util.updateQueryData("searchUser", searchQuery, (draft) => {
+              const user = draft.find((user) => user.username === username);
+              if (user) {
+                user.isFollowing = !user.isFollowing;
+              }
+            })
+          ),
+        ];
         try {
           await queryFulfilled;
         } catch (error) {
