@@ -26,14 +26,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-
+import Container from "./Container";
 import Login from "@/pages/auth/Login.jsx";
 import App from "@/App";
 import Home from "@/pages/Home";
 import Register from "@/pages/auth/Register.jsx";
-import TweetCard from "@/components/Tweet";
 import Spinner from "@/components/loader/Spinner";
-import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
 import TweetBox from "@/components/TweetBox";
 import TweetDetails from "@/pages/TweetDetails";
@@ -48,9 +46,8 @@ export {
   sidebarItems,
   profileRoutes,
   Button,
-  Container,
   Sidebar,
-  TweetCard,
+  
   Spinner,
   useToast,
   Home,
@@ -60,6 +57,7 @@ export {
   Login,
   App,
   Label,
+  Container,
   Input,
   Dialog,
   DialogClose,
