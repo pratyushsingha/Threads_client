@@ -1,13 +1,6 @@
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Heart,
-  Bookmark,
-  Share2,
-  MessageCircle,
-  Copy,
-  Repeat2,
-} from "lucide-react";
+import { Share2, MessageCircle, Copy, Repeat2 } from "lucide-react";
 
 import {
   Label,
@@ -24,19 +17,17 @@ import {
   useToast,
 } from "@/components/Index";
 import CommentBox from "./CommentBox";
-import {
-  useToggleBookmarkMutation,
-  useToggleLikeMutation,
-} from "@/services/tweetAPI";
+import { useToggleLikeMutation } from "@/services/tweetAPI";
 import { useRepostTweetMutation } from "@/services/repostAPI";
+import { IoHeartOutline, IoHeartSharp } from "react-icons/io5";
+import { setTweetBoxType } from "@/features/tweetSlice";
 
 const Widgets = ({ data, type }) => {
   const { toast } = useToast();
   const inputRef = useRef();
+  const dispatch = useDispatch();
   const [toggleLike] = useToggleLikeMutation();
-  const [toggleBookmark] = useToggleBookmarkMutation();
   const [repostTweet] = useRepostTweetMutation();
-  // const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
 
   const handleCopy = () => {
@@ -64,20 +55,34 @@ const Widgets = ({ data, type }) => {
   };
 
   return (
-    <div className="flex gap-x-4 ">
-      <button
+    <div className="flex space-x-1 md:space-x-1 ">
+      <Button
+        variant="ghost"
         onClick={() => toggleLike(data._id, user.username)}
-        className="group inline-flex items-center gap-x-1 outline-none after:content-[attr(data-like-count)] focus:after:content-[attr(data-like-count-alt)] hover:text-[#1A8CD8]"
+        className="rounded-3xl space-x-1"
       >
-        {data.isLiked === true ? <Heart fill="#1A8CD8" /> : <Heart />}
-        <span>{data.likeCount}</span>
-      </button>
+        {data.isLiked === true ? (
+          <>
+            <IoHeartSharp className="w-6 h-6 text-[#DC143C]" />
+            <span className="text-[#DC143C]">{data.likeCount}</span>
+          </>
+        ) : (
+          <>
+            <IoHeartOutline className="w-6 h-6" />
+            <span>{data.likeCount}</span>
+          </>
+        )}
+      </Button>
       <Dialog>
         <DialogTrigger asChild>
-          <button className="inline-flex items-center gap-x-1 outline-none hover:text-[#1A8CD8]">
-            <MessageCircle />
+          <Button
+            onClick={() => dispatch(setTweetBoxType("replyOnTweet"))}
+            variant="ghost"
+            className="rounded-3xl space-x-1"
+          >
+            <MessageCircle className="w-6 h-6" />
             <span>{data.commentCount}</span>
-          </button>
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogTitle>Reply</DialogTitle>
@@ -87,9 +92,9 @@ const Widgets = ({ data, type }) => {
       <div className="ml-auto">
         <Dialog>
           <DialogTrigger asChild>
-            <button className="mr-2 inline-flex items-center gap-x-1 outline-none hover:text-[#1A8CD8]">
+            <Button variant="ghost" className="rounded-3xl space-x-1">
               <Share2 />
-            </button>
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -131,25 +136,17 @@ const Widgets = ({ data, type }) => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        <button
-          onClick={() => toggleBookmark(data._id)}
-          className={`
-           group inline-flex items-center gap-x-1 outline-none hover:text-[#1A8CD8] `}
+        <Button
+          onClick={data.isReposted ? null : handleRepost}
+          variant="ghost"
+          className="rounded-3xl space-x-1"
         >
-          {data.isBookmarked === true ? (
-            <Bookmark fill="#1A8CD8" />
+          {data.isReposted === true ? (
+            <Repeat2 className="w-6 h-6 text-green-600" />
           ) : (
-            <Bookmark />
+            <Repeat2 className="w-6 h-6" />
           )}
-        </button>
-        <button
-          onClick={handleRepost}
-          className={`
-          } group inline-flex items-center gap-x-1 outline-none hover:text-[#1A8CD8] `}
-        >
-          <Repeat2 />
-        </button>
+        </Button>
       </div>
     </div>
   );

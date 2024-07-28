@@ -18,11 +18,12 @@ import LikedTweets from "./pages/LikedTweets";
 import AuthLayout from "./components/AuthLayout";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
-import CommentDetails from "./pages/CommentDetails";
 import RepostPage from "./pages/RepostPage";
 import RepliedTweetsPage from "./pages/RepliedTweetsPage";
 import ErrorPage from "./pages/ErrorPage";
 import FeedPage from "./pages/FeedPage";
+import SearchPage from "./pages/SearchPage";
+import ActivityPage from "./pages/ActivityPage";
 
 const router = createBrowserRouter([
   {
@@ -47,17 +48,14 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "/search", element: <SearchPage /> },
+      { path: "/activity", element: <ActivityPage /> },
       { path: "/tweet/:id", element: <TweetDetails /> },
       {
         path: "/profile/:username",
         element: <Profile />,
         children: [
           { path: "/profile/:username", element: <Tweets /> },
-          // {
-          //   path: "/profile/:username/bookmarkedTweets",
-          //   element: <BookmarkedTweets />,
-          // },
-          // { path: "/profile/:username/likedTweets", element: <LikedTweets /> },
           { path: "/profile/:username/edit", element: <UserDetails /> },
           { path: "/profile/:username/reposts", element: <RepostPage /> },
           {

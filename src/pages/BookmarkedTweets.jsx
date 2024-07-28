@@ -15,7 +15,10 @@ const BookmarkedTweets = () => {
 
   return bookmarkedTweets.length > 0 ? (
     bookmarkedTweets?.map((tweet) => (
-      <TweetCard type="HomeCommentOnTweet" key={tweet._id} tweet={tweet} />
+      <section key={tweet._id}>
+        <TweetCard type="HomeCommentOnTweet" tweet={tweet} />
+        <hr />
+      </section>
     ))
   ) : (
     <p>be the first to add a tweet</p>

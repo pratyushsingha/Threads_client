@@ -156,7 +156,7 @@ const Profile = () => {
         </div>
         {userProfile?._id === user?._id ? (
           <Dialog>
-            <DialogTrigger className="w-full">
+            <DialogTrigger className="w-full px-5">
               <Button variant="outline" className="w-full">
                 Edit Profile
               </Button>
@@ -263,18 +263,20 @@ const Profile = () => {
             </DialogContent>
           </Dialog>
         ) : (
-          <Button
-            variant={userProfile?.isFollowing ? "outline" : ""}
-            className="w-full justify-center mr-10"
-            onClick={() =>
-              handleFollow({
-                followerId: userProfile?._id,
-                username: userProfile?.username,
-              })
-            }
-          >
-            {userProfile?.isFollowing ? "Unfollow" : "Follow"}
-          </Button>
+          <div className="px-5">
+            <Button
+              variant={userProfile?.isFollowing ? "outline" : ""}
+              className="w-full justify-center px-5"
+              onClick={() =>
+                handleFollow({
+                  followerId: userProfile?._id,
+                  username: userProfile?.username,
+                })
+              }
+            >
+              {userProfile?.isFollowing ? "Unfollow" : "Follow"}
+            </Button>
+          </div>
         )}
         <div className="flex justify-between p-5">
           {profileRoutes.map(({ _id, title, path }) => (
