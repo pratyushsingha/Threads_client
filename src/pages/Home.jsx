@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setHomeRoute, setPage, setTweetBoxType } from "@/features/tweetSlice";
+import { setTweetBoxType } from "@/features/tweetSlice";
 import {
   TweetBox,
   Spinner,
@@ -10,70 +10,34 @@ import {
   DialogContent,
 } from "@/components/Index";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CiCircleChevDown } from "react-icons/ci";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { homeRoutes } from "@/utils/Index";
-import FeedPage from "./FeedPage";
-import { useEffect } from "react";
+
+import { Link, Outlet } from "react-router-dom";
 
 const Home = () => {
-  const location = useLocation();
   const { tweetBoxType } = useSelector((store) => store.tweet);
 
   const { user } = useSelector((store) => store.auth);
-  const { homeRoute } = useSelector((store) => store.tweet);
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (location.pathname === "/") {
-      dispatch(setHomeRoute("For You"));
-    } else {
-      dispatch(setHomeRoute(location.pathname.split("/").pop()));
-    }
-  }, [location]);
-
   return (
     <>
-      <div className="flex justify-center items-center space-x-2">
-        <span className="font-bold text-xl">{homeRoute}</span>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost">
-              <CiCircleChevDown className="text-2xl" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {homeRoutes.map((item) => (
-              <Link to={`${item.path}`} key={item._id}>
-                <DropdownMenuItem>{item.title} </DropdownMenuItem>
-              </Link>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="flex justify-between">
-        <Avatar>
-          <AvatarImage src={user.avatar} />
-          <AvatarFallback>
-            {user.username.split("")[0].toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+      <div className="flex justify-between p-5">
+        <Link to={`/profile/${user.username}`}>
+          <Avatar>
+            <AvatarImage src={user.avatar} />
+            <AvatarFallback>
+              {user.username.split("")[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
         <Dialog>
           <DialogTrigger asChild>
             <p
               onClick={() => dispatch(setTweetBoxType("createTweet"))}
               className="self-center"
             >
-              start a thread
+              Start a Tweet
             </p>
           </DialogTrigger>
           <DialogContent>
@@ -89,6 +53,7 @@ const Home = () => {
           </DialogContent>
         </Dialog>
       </div>
+      <hr />
       <Outlet />
     </>
   );

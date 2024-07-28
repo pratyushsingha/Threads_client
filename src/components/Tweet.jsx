@@ -4,7 +4,7 @@ import Widgets from "./Widgets";
 
 const Tweet = ({ tweet }) => {
   return (
-    <>
+    <div className="">
       <div className="relative mb-2 w-full last:mb-0 sm:mb-4">
         <div className="flex p-2">
           <div className="h-10 w-10 shrink-0 sm:h-12 sm:w-12">
@@ -79,7 +79,7 @@ const Tweet = ({ tweet }) => {
         </div>
       </div>
       <Widgets data={tweet} />
-    </>
+    </div>
   );
 };
 

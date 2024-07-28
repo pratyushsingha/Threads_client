@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useToast, CommentCard, Spinner } from "@/components/Index";
+import { Spinner } from "@/components/Index";
 import { useDispatch } from "react-redux";
 import TweetCard from "@/components/TweetCard";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -29,8 +29,6 @@ const TweetDetails = () => {
     dispatch(setIdParams(id));
   }, [id, dispatch]);
 
-
-
   if (isTweetDetailsError)
     return <p>something went wrong while getting tweetDetils</p>;
 
@@ -42,8 +40,17 @@ const TweetDetails = () => {
       {isTweetDetailsLoading ? (
         <Spinner />
       ) : (
-        tweetDetails.map((t) => <TweetCard key={t._id} tweet={t} />)
+        <>
+          {tweetDetails.map((t) => (
+            <TweetCard key={t._id} tweet={t} />
+          ))}
+          <hr />
+        </>
       )}
+      <div className="p-4 bg-[#181818]">
+        <p className="font-3xl font-bold ">Replies</p>
+      </div>
+      <hr />
       {
         isTweetRepliesLoading ? (
           <Spinner />
@@ -57,7 +64,7 @@ const TweetDetails = () => {
 
         tweetReplies?.length > 0 ? (
           tweetReplies.map((comment) => (
-            <CommentCard key={comment._id} comment={comment} />
+            <TweetCard key={comment._id} tweet={comment} />
           ))
         ) : (
           <p>Be the first to add a comment</p>

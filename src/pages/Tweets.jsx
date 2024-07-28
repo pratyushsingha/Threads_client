@@ -36,9 +36,18 @@ const Tweets = () => {
   if (myTweetsError || publicTweetsError) return <p>something went wrong</p>;
   const tweets = username === user.username ? myTweets : publicTweets;
 
-  return tweets?.map((tweet) => (
-    <TweetCard type="HomeCommentOnTweet" key={tweet._id} tweet={tweet} />
-  ));
+  return tweets?.length > 0 ? (
+    tweets.map((tweet) => (
+      <>
+        <TweetCard type="HomeCommentOnTweet" key={tweet._id} tweet={tweet} />
+        <hr />
+      </>
+    ))
+  ) : (
+    <div className="flex justify-center items-center my-9">
+      Be the first to add a repost
+    </div>
+  );
 };
 
 export default Tweets;

@@ -21,14 +21,19 @@ import { useDispatch } from "react-redux";
 import { setTweetBoxType } from "@/features/tweetSlice";
 import Widgets from "./Widgets";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { BsThreeDots } from "react-icons/bs";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useToggleBookmarkMutation } from "@/services/tweetAPI";
 
 const TweetCard = ({ tweet }) => {
   const dispatch = useDispatch();
+  const [toggleBookmark] = useToggleBookmarkMutation();
 
   useEffect(() => {
     dispatch(setTweetBoxType("replyOnTweet"));
@@ -36,7 +41,7 @@ const TweetCard = ({ tweet }) => {
 
   return (
     <div className="relative w-full">
-      <div className="flex border-b border-t border-slate p-4 text-white sm:border-l sm:border-r bg-[#181818]">
+      <div className="flex p-4 text-white ">
         <Link to={`/profile/${tweet.ownerDetails.username}`}>
           <Avatar>
             <AvatarImage
@@ -63,6 +68,34 @@ const TweetCard = ({ tweet }) => {
                 {moment(tweet.updatedAt, "YYYYMMDD").fromNow()}
               </span>
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <button className="ml-auto shrink-0">
+                  <BsThreeDots />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2"
+                    onClick={() => toggleBookmark(tweet._id)}
+                  >
+                    {tweet.isBookmarked === true ? (
+                      <>
+                        <Bookmark fill="#FFFFFF" className="w-6 h-6" />
+                        <span>Unsave</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark className="w-6 h-6" />
+                        <span>Save</span>
+                      </>
+                    )}
+                  </Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <Link to={`/tweet/${tweet._id}`}>
             <p className="mb-4 text-sm sm:text-base">{tweet.content}</p>

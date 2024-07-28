@@ -19,7 +19,9 @@ const RepostPage = () => {
   return repostTweets.length > 0 ? (
     repostTweets.map((tweet) => <RepostCard key={tweet._id} tweet={tweet} />)
   ) : (
-    <p>be the first to add a repost</p>
+    <div className="flex justify-center items-center my-9">
+      Be the first to add a repost
+    </div>
   );
 };
 

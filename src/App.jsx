@@ -4,6 +4,7 @@ import LoadingBar from "react-top-loading-bar";
 
 import "./index.css";
 import { Container, Sidebar, Spinner } from "@/components/Index";
+import Header from "./components/Header";
 
 function App() {
   // const { progress, setProgress, loading } = useContext(AppContext);
@@ -16,11 +17,10 @@ function App() {
               <Sidebar />
             </div>
             <div className="sm:col-span-8 col-span-10 h-full overflow-y-auto hide-scrollbar">
-              
-              <Outlet />
-            </div>
-            <div className="hidden sm:block sm:col-span-2 sticky top-0 h-full">
-              who to follow
+              <Header />
+              <div className="overflow-y-auto hide-scrollbar min-h-screen bg-[#181818] rounded-t-3xl ">
+                <Outlet />
+              </div>
             </div>
           </div>
         </div>

@@ -35,7 +35,6 @@ import TweetCard from "@/components/Tweet";
 import Spinner from "@/components/loader/Spinner";
 import Container from "@/components/Container";
 import Sidebar from "@/components/Sidebar";
-import CommentCard from "@/components/CommentCard";
 import TweetBox from "@/components/TweetBox";
 import TweetDetails from "@/pages/TweetDetails";
 import Profile from "@/pages/auth/Profile";
@@ -70,7 +69,6 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  CommentCard,
   TweetBox,
   Separator,
   Switch,

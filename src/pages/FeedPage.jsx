@@ -27,7 +27,10 @@ const FeedPage = () => {
       >
         {data.length > 0 ? (
           data.map((tweet, index) => (
-            <TweetCard type="HomeCommentOnTweet" key={index} tweet={tweet} />
+            <section key={index}>
+              <TweetCard type="HomeCommentOnTweet" tweet={tweet} />
+              <hr />
+            </section>
           ))
         ) : (
           <h3

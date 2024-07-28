@@ -1,29 +1,26 @@
-import { Home, BellDot, Mails, Bot } from "lucide-react";
+import { GoHeart, GoHome, GoSearch } from "react-icons/go";
+import { FaRegUser } from "react-icons/fa";
 
 export const sidebarItems = [
   {
     _id: 1,
-    title: "Home",
-    icon: <Home />,
-    path: "",
+    title: "/",
+    icon: <GoHome />,
   },
   {
     _id: 2,
-    title: "Notifications",
-    icon: <BellDot />,
-    path: "notifications",
+    title: "search",
+    icon: <GoSearch />,
   },
   {
     _id: 3,
-    title: "Messages",
-    icon: <Mails />,
-    path: "chat",
+    title: "activity",
+    icon: <GoHeart />,
   },
   {
     _id: 4,
-    title: "Grok",
-    icon: <Bot />,
-    path: "grok",
+    title: "profile",
+    icon: <FaRegUser />,
   },
 ];
 
