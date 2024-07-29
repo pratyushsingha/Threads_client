@@ -13,7 +13,7 @@ function App() {
       <Container className="md:h-screen overflow-hidden">
         <div className="sm:mx-20 my-4 h-full flex">
           <div className="grid grid-cols-4 gap-4 sm:grid-cols-12 w-full h-full">
-            <div className="sm:col-span-2 sticky top-0 h-full">
+            <div className="hidden md:block sm:col-span-2 sticky top-0 h-full">
               <Sidebar />
             </div>
             <div className="sm:col-span-8 col-span-10 h-full overflow-y-auto hide-scrollbar">
@@ -23,6 +23,9 @@ function App() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="block md:hidden fixed bottom-0 left-0 w-full bg-black z-50">
+          <Sidebar />
         </div>
       </Container>
     </>
