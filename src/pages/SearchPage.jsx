@@ -47,7 +47,7 @@ const SearchPage = () => {
   const users = debounceQuery ? searchedUser : userSuggestions;
 
   return (
-    <section className="p-4">
+    <section className="p-5">
       <Input
         ref={searchInputRef}
         value={searchUser}
