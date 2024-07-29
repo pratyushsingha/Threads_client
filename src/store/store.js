@@ -8,6 +8,7 @@ import { repostApi } from "@/services/repostAPI";
 import { followApi } from "@/services/followAPI";
 import { replyApi } from "@/services/replyAPI";
 import { authApi } from "@/services/authAPI";
+import { activityApi } from "@/services/activityAPI";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     [repostApi.reducerPath]: repostApi.reducer,
     [followApi.reducerPath]: followApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [activityApi.reducerPath]: activityApi.reducer,
     auth: authReducer,
     tweet: tweetReducer,
   },
@@ -25,7 +27,8 @@ export const store = configureStore({
       replyApi.middleware,
       repostApi.middleware,
       followApi.middleware,
-      tweetApi.middleware
+      tweetApi.middleware,
+      activityApi.middleware
     ),
 });
 
