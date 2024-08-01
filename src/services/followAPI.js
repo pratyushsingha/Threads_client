@@ -15,12 +15,19 @@ export const followApi = createApi({
       transformResponse: (response) => response.data,
     }),
     updateUserDetails: builder.mutation({
-      query: (data) => ({
-        url: `/users/profile`,
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: ["userProfile"],
+      query: (data) => {
+        // data should be an instance of FormData
+        return {
+          url: `/users/profile`,
+          method: "PATCH",
+          headers: {
+            // Accept: "application/json",
+            "Content-Type": "multipart/form-data;",
+          },
+          body: data,
+        };
+      },
+      invalidatesTags: ["userProfile"], // This will re-fetch the user profile data upon mutation success
     }),
 
     handleFollow: builder.mutation({
@@ -48,7 +55,9 @@ export const followApi = createApi({
               "userSuggetions",
               undefined,
               (draft) => {
-                const user = draft.find((user) => user.username === username);
+                const user = draft.users.find(
+                  (user) => user.username === username
+                );
                 if (user) {
                   user.isFollowing = !user.isFollowing;
                 }
@@ -57,7 +66,9 @@ export const followApi = createApi({
           ),
           dispatch(
             authApi.util.updateQueryData("searchUser", searchQuery, (draft) => {
-              const user = draft.find((user) => user.username === username);
+              const user = draft.users.find(
+                (user) => user.username === username
+              );
               if (user) {
                 user.isFollowing = !user.isFollowing;
               }

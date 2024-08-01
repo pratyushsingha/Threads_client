@@ -58,15 +58,19 @@ const profileSchema = z.object({
     ),
   bio: z.string(),
   portfolio: z.string().url("Portfolio must be a valid URL"),
+  avatar: z
+    .instanceof(File)
+    .refine((file) => file.startsWith("image/"), "File must be an image"),
 });
 
 const Profile = () => {
-  const avatarRef = useRef(null);
+  const hiddenInputRef = useRef(null);
   const { toast } = useToast();
   const location = useLocation();
   const { username } = useParams();
   const dispatch = useDispatch();
-  const [newAvatar, setNewAvatar] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [handleFollow] = useHandleFollowMutation();
   const { data: user } = useGetCurrentUserQuery();
   const {
@@ -81,6 +85,7 @@ const Profile = () => {
     register,
     handleSubmit,
     formState: { errors, isDirty, isTouched, isSubmitting, isSubmitSuccessful },
+    watch,
     setValue,
   } = useForm({
     defaultValues: {
@@ -89,19 +94,21 @@ const Profile = () => {
       tags: "",
       bio: "",
       portfolio: "",
+      avatar: "",
     },
     resolver: zodResolver(profileSchema),
   });
+  console.log(userProfile);
 
-  console.log(location.pathname);
   const oldUserDetails = () => {
     setValue("firstName", userProfile?.fullName.split(" ")[0]);
     setValue("lastName", userProfile?.fullName.split(" ")[1]);
     setValue("tags", userProfile?.tags);
     setValue("bio", userProfile?.bio);
     setValue("portfolio", userProfile?.portfolio);
+    setValue("avatar", userProfile?.avatar);
   };
-  console.log(newAvatar);
+
   const handleUpdateProfile = async (data) => {
     try {
       const formData = new FormData();
@@ -109,8 +116,9 @@ const Profile = () => {
       formData.append("tags", data.tags);
       formData.append("bio", data.bio);
       formData.append("portfolio", data.portfolio);
-      formData.append("avatar", newAvatar);
-      console.log({ ...data, avatar: newAvatar });
+      formData.append("avatar", data.avatar[0]);
+
+      console.log(data);
 
       await updateProfile(formData).unwrap();
       toast({
@@ -129,8 +137,16 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(setUsernameParams(username));
-    oldUserDetails();
   }, []);
+
+  // useEffect(() => {
+  //   if (avatar) {
+  //     const imageUrl = URL.createObjectURL(avatar[0]);
+  //     setAvatar(imageUrl);
+  //   } else {
+  //     setAvatar(userProfile?.avatar);
+  //   }
+  // }, [avatar, userProfile]);
 
   if (profileDetailsLoading) {
     return <Spinner />;
@@ -157,7 +173,11 @@ const Profile = () => {
         {userProfile?._id === user?._id ? (
           <Dialog>
             <DialogTrigger className="w-full px-5">
-              <Button variant="outline" className="w-full">
+              <Button
+                onClick={oldUserDetails}
+                variant="outline"
+                className="w-full"
+              >
                 Edit Profile
               </Button>
             </DialogTrigger>
@@ -181,43 +201,41 @@ const Profile = () => {
                         </p>
                       </div>
                       <div>
-                        <DropdownMenu>
+                        {/* <DropdownMenu>
                           <DropdownMenuTrigger>
                             <Avatar className="w-16 h-16">
-                              <AvatarImage src={userProfile.avatar} />
+                              <AvatarImage src={userProfile?.avatar} />
                               <AvatarFallback>
                                 {userProfile.username}
                               </AvatarFallback>
                             </Avatar>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="mr-16">
-                            <DropdownMenuItem>
-                              <Button
-                                onClick={() => avatarRef.current.click()}
+                            <DropdownMenuItem> */}
+                        {/* <Button
+                                onClick={onUpload}
                                 className="font-bold w-full text-start"
                                 variant="ghost"
                               >
                                 Upload Profile Picture
-                              </Button>
-                              <input
-                                ref={avatarRef}
-                                className="hidden"
-                                type="file"
-                                onChange={(e) => {
-                                  setNewAvatar(e.target.files[0]);
-                                }}
-                              />
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
+                              </Button> */}
+                        <input
+                          accept="image/png, image/jpg, image/jpeg"
+                          // className="hidden"
+                          type="file"
+                          {...register("avatar")}
+                        />
+                        {/* </DropdownMenuItem> */}
+                        {/* <DropdownMenuItem>
                               <Button
                                 className="text-red-500 font-bold"
                                 variant="ghost"
                               >
                                 Remove current Picture
                               </Button>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuItem> */}
+                        {/* </DropdownMenuContent> */}
+                        {/* </DropdownMenu> */}
                       </div>
                     </div>
                     <InputDiv

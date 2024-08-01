@@ -40,9 +40,16 @@ export const tweetApi = createApi({
   ],
   endpoints: (builder) => ({
     getFeedTweets: builder.query({
-      query: (page = 1) => `/tweet?page=${page}&limit=20`,
+      query: (page) => `/tweet?page=${page}&limit=15`,
       providesTags: ["tweets"],
-      transformResponse: (response) => response.data.tweets,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newTweets) => {
+        currentCache.tweets.push(...newTweets.tweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
+      transformResponse: (response) => response.data,
     }),
     createTweet: builder.mutation({
       query: (data) => {
@@ -69,14 +76,16 @@ export const tweetApi = createApi({
     getLikedTweets: builder.query({
       query: (page = 1) => `/like/tweets?page=${page}&limit=20`,
       providesTags: ["likedTweets"],
-      transformResponse: (response) => response.data.tweets,
-    }),
-
-    getPublicTweets: builder.query({
-      query: (username, page = 1) => `/tweet/${username}?page=${page}&limit=20`,
-      providesTags: ["publicTweets"],
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newTweets) => {
+        currentCache.tweets.push(...newTweets.tweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
       transformResponse: (response) => response.data,
     }),
+
     toggleLike: builder.mutation({
       query: (tweetId) => ({
         url: `/like/tweet/${tweetId}`,
@@ -86,20 +95,22 @@ export const tweetApi = createApi({
       async onQueryStarted(tweetId, { dispatch, queryFulfilled, getState }) {
         const username = getState().auth.usernameParams;
         const id = getState().auth.idParams;
-        
+
         const tweetUpdate = [
           dispatch(
             tweetApi.util.updateQueryData(
               "getFeedTweets",
               undefined,
               (tweets) => {
-                updateLikedTweet(tweets, tweetId);
+                updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
           dispatch(
             replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              const tweet = draft.find((tweet) => tweet.tweetId === tweetId);
+              const tweet = draft.replies.find(
+                (tweet) => tweet.tweetId === tweetId
+              );
               if (tweet) {
                 tweet.isLiked = !tweet.isLiked;
                 if (tweet.isLiked) {
@@ -115,13 +126,13 @@ export const tweetApi = createApi({
               "getBookmarkedTweets",
               undefined,
               (tweets) => {
-                updateLikedTweet(tweets, tweetId);
+                updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
           dispatch(
             tweetApi.util.updateQueryData("getMyTweets", username, (tweets) => {
-              updateLikedTweet(tweets, tweetId);
+              updateLikedTweet(tweets.tweets, tweetId);
             })
           ),
           dispatch(
@@ -129,7 +140,7 @@ export const tweetApi = createApi({
               "getPublicTweets",
               username,
               (tweets) => {
-                updateLikedTweet(tweets, tweetId);
+                updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -138,7 +149,7 @@ export const tweetApi = createApi({
               "getLikedTweets",
               undefined,
               (tweets) => {
-                updateLikedTweet(tweets, tweetId);
+                updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -152,7 +163,7 @@ export const tweetApi = createApi({
               "getRepostedTweets",
               username,
               (repostedTweets) => {
-                const tweet = repostedTweets.find(
+                const tweet = repostedTweets.reposts.find(
                   (tweet) => tweet.tweetId === tweetId
                 );
                 if (tweet) {
@@ -171,7 +182,7 @@ export const tweetApi = createApi({
               "getRepliedTweets",
               username,
               (repliedTweets) => {
-                const tweet = repliedTweets.find(
+                const tweet = repliedTweets.repliedTweets.find(
                   (repliedTweet) => repliedTweet._id === tweetId
                 );
                 if (tweet) {
@@ -182,7 +193,7 @@ export const tweetApi = createApi({
                     tweet.likeCount -= 1;
                   }
                 } else {
-                  const reply = repliedTweets.find(
+                  const reply = repliedTweets.repliedTweets.find(
                     (reply) => reply.tweetId === tweetId
                   );
                   if (reply) {
@@ -199,7 +210,7 @@ export const tweetApi = createApi({
           ),
           dispatch(
             replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              updateLikedTweet(draft, tweetId);
+              updateLikedTweet(draft.replies, tweetId);
             })
           ),
         ];
@@ -215,9 +226,16 @@ export const tweetApi = createApi({
     }),
 
     getBookmarkedTweets: builder.query({
-      query: (page = 1) => `/bookmarks?page=${page}&limit=20`,
+      query: (page) => `/bookmarks?page=${page}&limit=20`,
       providesTags: ["bookmarks"],
-      transformResponse: (response) => response.data.bookmarkedTweet,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newTweets) => {
+        currentCache.bookmarkedTweet.push(...newTweets.bookmarkedTweet);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
+      transformResponse: (response) => response.data,
     }),
     toggleBookmark: builder.mutation({
       query: (tweetId) => ({
@@ -231,11 +249,8 @@ export const tweetApi = createApi({
 
         const tweetUpdate = [
           dispatch(
-            replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              const tweet = draft.find((tweet) => tweet._id === tweetId);
-              if (tweet) {
-                tweet.isBookmarked = !tweet.isBookmarked;
-              }
+            replyApi.util.updateQueryData("getTweetReplies", id, (tweets) => {
+              updateBookmarkedTweet(tweets.replies, tweetId);
             })
           ),
           dispatch(
@@ -243,7 +258,7 @@ export const tweetApi = createApi({
               "getFeedTweets",
               undefined,
               (tweets) => {
-                updateBookmarkedTweet(tweets, tweetId);
+                updateBookmarkedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -252,7 +267,7 @@ export const tweetApi = createApi({
               "getBookmarkedTweets",
               undefined,
               (tweets) => {
-                updateBookmarkedTweet(tweets, tweetId);
+                updateBookmarkedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -260,7 +275,7 @@ export const tweetApi = createApi({
             tweetApi.util.updateQueryData("getMyTweets", username, (tweets) => {
               console.log(tweets);
 
-              updateBookmarkedTweet(tweets, tweetId);
+              updateBookmarkedTweet(tweets.tweets, tweetId);
             })
           ),
           dispatch(
@@ -268,7 +283,7 @@ export const tweetApi = createApi({
               "getPublicTweets",
               username,
               (tweets) => {
-                updateBookmarkedTweet(tweets, tweetId);
+                updateBookmarkedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -277,7 +292,7 @@ export const tweetApi = createApi({
               "getLikedTweets",
               username,
               (tweets) => {
-                updateBookmarkedTweet(tweets, tweetId);
+                updateBookmarkedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -292,7 +307,7 @@ export const tweetApi = createApi({
               "getRepostedTweets",
               username,
               (repostedTweets) => {
-                const tweet = repostedTweets.find(
+                const tweet = repostedTweets.reposts.find(
                   (tweet) => tweet.tweetId === tweetId
                 );
                 if (tweet) {
@@ -307,13 +322,13 @@ export const tweetApi = createApi({
               "getRepliedTweets",
               username,
               (repliedTweets) => {
-                const tweet = repliedTweets.find(
+                const tweet = repliedTweets.repliedTweets.find(
                   (repliedTweet) => repliedTweet._id === tweetId
                 );
                 if (tweet) {
                   tweet.isBookmarked = !tweet.isBookmarked;
                 } else {
-                  const reply = repliedTweets.find(
+                  const reply = repliedTweets.repliedTweets.find(
                     (reply) => reply.tweetId === tweetId
                   );
                   if (reply) {
@@ -335,15 +350,29 @@ export const tweetApi = createApi({
     }),
 
     getMyTweets: builder.query({
-      query: (username, page = 1) =>
+      query: (username, page) =>
         `/tweet/tweets/${username}?page=${page}&limit=20`,
       providesTags: ["myTweets"],
-      transformResponse: (response) => response.data.tweets,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newTweets) => {
+        currentCache.tweets.push(...newTweets.tweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
+      transformResponse: (response) => response.data,
     }),
     getPublicTweets: builder.query({
-      query: (username, page = 1) => `/tweet/${username}?page=${page}&limit=20`,
+      query: (username, page) => `/tweet/${username}?page=${page}&limit=20`,
       providesTags: "publicTweets",
-      transformResponse: (response) => response.data.tweets,
+      serializeQueryArgs: (args) => args,
+      merge: (currentCache, newTweets) => {
+        currentCache.tweets.push(...newTweets.tweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
+      transformResponse: (response) => response.data,
     }),
     getTweetById: builder.query({
       query: (tweetId) => `/tweet/tweet/${tweetId}`,

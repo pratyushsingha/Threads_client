@@ -13,9 +13,14 @@ export const replyApi = createApi({
   }),
   endpoints: (builder) => ({
     getRepliedTweets: builder.query({
-      query: (username, page = 1) =>
+      query: (username, page) =>
         `tweet/reply/u/${username}?page=${page}&limit=20`,
-      transformResponse: (response) => response.data.repliedTweets,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newReplies) => {
+        currentCache.push(...newReplies.repliedTweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
+      transformResponse: (response) => response.data,
     }),
     replyOnTweet: builder.mutation({
       query: ({ data, tweetId }) => {
@@ -51,11 +56,13 @@ export const replyApi = createApi({
               "getRepliedTweets",
               username,
               (draft) => {
-                const tweet = draft.find((tweet) => tweet._id === tweetId);
+                const tweet = draft.repliedTweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
                 if (tweet) {
                   tweet.commentCount += 1;
                 } else {
-                  const reply = draft.find(
+                  const reply = draft.repliedTweets.find(
                     (reply) => reply.tweetId === tweetId
                   );
                   if (reply) {
@@ -67,16 +74,18 @@ export const replyApi = createApi({
           ),
           dispatch(
             replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              // draft.push({
-              //   ...data,
-              //   ownerDetails: getState().auth.user,
-              //   updatedAt: new Date().toISOString(),
-              //   commentCount: 0,
-              //   likeCount: 0,
-              //   isLiked: false,
-              //   _id: Math.random().toString(),
-              // });
-              const tweet = draft.find((tweet) => tweet._id === tweetId);
+              draft.replies.push({
+                ...data,
+                ownerDetails: getState().auth.user,
+                updatedAt: new Date().toISOString(),
+                commentCount: 0,
+                likeCount: 0,
+                isLiked: false,
+                _id: Math.random().toString(),
+              });
+              const tweet = draft.replies.find(
+                (tweet) => tweet._id === tweetId
+              );
               if (tweet) {
                 tweet.commentCount += 1;
               }
@@ -87,7 +96,9 @@ export const replyApi = createApi({
               "getFeedTweets",
               undefined,
               (draft) => {
-                const tweet = draft.find((tweet) => tweet._id === tweetId);
+                const tweet = draft.tweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
                 if (tweet) {
                   tweet.commentCount += 1;
                 }
@@ -99,7 +110,9 @@ export const replyApi = createApi({
               "getRepostedTweets",
               username,
               (draft) => {
-                const tweet = draft.find((tweet) => tweet.tweetId === tweetId);
+                const tweet = draft.reposts.find(
+                  (tweet) => tweet.tweetId === tweetId
+                );
                 if (tweet) {
                   tweet.tweetDetails.commentCount += 1;
                 }
@@ -108,7 +121,7 @@ export const replyApi = createApi({
           ),
           dispatch(
             tweetApi.util.updateQueryData("getMyTweets", username, (draft) => {
-              const tweet = draft.find((tweet) => tweet._id === tweetId);
+              const tweet = draft.tweets.find((tweet) => tweet._id === tweetId);
               if (tweet) {
                 tweet.commentCount += 1;
               }
@@ -119,7 +132,9 @@ export const replyApi = createApi({
               "getPublicTweets",
               username,
               (draft) => {
-                const tweet = draft.find((tweet) => tweet._id === tweetId);
+                const tweet = draft.tweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
                 if (tweet) {
                   tweet.commentCount += 1;
                 }
@@ -136,10 +151,9 @@ export const replyApi = createApi({
       },
     }),
     getTweetReplies: builder.query({
-      query: (tweetId, page = 1) =>
-        `/tweet/reply/${tweetId}?page=${page}&limit=50`,
-      // providesTags: ["tweetReplies"],
-      transformResponse: (response) => response.data.replies,
+      query: (tweetId, page) => `/tweet/reply/${tweetId}?page=${page}&limit=50`,
+
+      transformResponse: (response) => response.data,
     }),
   }),
 });

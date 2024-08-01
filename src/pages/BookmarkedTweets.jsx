@@ -1,27 +1,25 @@
-import { Spinner } from "@/components/Index";
-import TweetCard from "@/components/TweetCard";
+import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
 import { useGetBookmarkedTweetsQuery } from "@/services/tweetAPI";
+import { useSelector } from "react-redux";
 
 const BookmarkedTweets = () => {
+  const { page } = useSelector((store) => store.tweet);
   const {
     data: bookmarkedTweets,
     isLoading,
     isError,
     error,
-  } = useGetBookmarkedTweetsQuery();
+  } = useGetBookmarkedTweetsQuery(page);
 
-  if (isLoading) return <Spinner />;
-  if (isError) return <p>something went wrong ${error.status}</p>;
-
-  return bookmarkedTweets.length > 0 ? (
-    bookmarkedTweets?.map((tweet) => (
-      <section key={tweet._id}>
-        <TweetCard type="HomeCommentOnTweet" tweet={tweet} />
-        <hr />
-      </section>
-    ))
-  ) : (
-    <p>be the first to add a tweet</p>
+  return (
+    <InfiniteScrollTemplate
+      data={bookmarkedTweets?.tweets}
+      isLoading={isLoading}
+      isError={isError}
+      error={error}
+      totalTweets={bookmarkedTweets?.totalTweets}
+      hasNextPage={bookmarkedTweets?.hasNextPage}
+    />
   );
 };
 

@@ -1,23 +1,25 @@
-import { Spinner } from "@/components/Index";
-import TweetCard from "@/components/TweetCard";
+import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
 import { useGetLikedTweetsQuery } from "@/services/tweetAPI";
+import { useSelector } from "react-redux";
 
 const LikedTweets = () => {
-  const { data: likedTweets, isLoading, isError } = useGetLikedTweetsQuery();
+  const { page } = useSelector((store) => store.tweet);
+  const {
+    data: likedTweets,
+    isLoading,
+    isError,
+    error,
+  } = useGetLikedTweetsQuery(currentPage);
 
-  if (isLoading) return <Spinner />;
-
-  if (isError) return <p>something went wrong</p>;
-
-  return likedTweets.length > 0 ? (
-    likedTweets[0].likedTweets.map((tweet) => (
-      <section key={tweet._id}>
-        <TweetCard type="HomeCommentOnTweet" tweet={tweet} />
-        <hr />
-      </section>
-    ))
-  ) : (
-    <p>be the first to add a tweet</p>
+  return (
+    <InfiniteScrollTemplate
+      data={likedTweets?.tweets}
+      isLoading={isLoading}
+      isError={isError}
+      error={error}
+      totalTweets={likedTweets?.totalTweets}
+      hasNextPage={likedTweets?.hasNextPage}
+    />
   );
 };
 

@@ -128,7 +128,7 @@ const TweetBox = ({ formType, id }) => {
 
   return (
     <form onSubmit={handleSubmit(submitHandler)}>
-      <div className="relative flex-col border-slate border-2 rounded px-2 py-2 my-4">
+      <div className="relative flex-col rounded px-2 py-2 my-4">
         <div className="flex space-x-5 w-full ">
           <div className="self-center">
             <Link to={`/profile/${user.username}`}>

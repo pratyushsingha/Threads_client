@@ -22,12 +22,19 @@ export const authApi = createApi({
       transformResponse: (response) => response.data,
     }),
     userSuggetions: builder.query({
-      query: () => "users/suggestions",
+      query: (page) => `users/suggestions?page=${page}&limit=20`,
       providesTags: ["User"],
-      transformResponse: (response) => response.data.users,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newData) => [...currentCache, ...newData.users],
+      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
+      transformResponse: (response) => response.data,
     }),
     searchUser: builder.query({
-      query: (data) => `/users/search?q=${data}`,
+      query: ({ data, page }) =>
+        `users/search?query=${data}&page=${page}&limit=20`,
+      serializeQueryArgs: ({ page }) => page,
+      merge: (currentCache, newData) => [...currentCache, ...newData.users],
+      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
       transformResponse: (response) => response.data,
     }),
   }),
