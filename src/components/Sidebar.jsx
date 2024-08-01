@@ -16,7 +16,7 @@ const Sidebar = () => {
                 : `${item.title}`
             }
           >
-            <Button variant="ghost" className="p-3">
+            <Button variant="ghost" className="p-5 py-5">
               <p className="text-2xl md:text-3xl py-2">{item.icon}</p>
             </Button>
           </Link>

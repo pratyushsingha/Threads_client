@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -34,7 +34,7 @@ const Header = () => {
     location.pathname === "/saved"
   ) {
     return (
-      <div className="flex justify-center items-center space-x-2 mb-3">
+      <div className="flex justify-center items-center space-x-2 mb-3 sticky top-0 z-50 bg-black md:w-8/12">
         <span className="font-bold text-xl">
           {homeRoute.charAt(0).toUpperCase() + homeRoute.toLowerCase().slice(1)}
         </span>
@@ -56,7 +56,7 @@ const Header = () => {
     );
   } else {
     return (
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 md:w-8/12">
         <Button
           onClick={() => navigate(-1)}
           size="sm"

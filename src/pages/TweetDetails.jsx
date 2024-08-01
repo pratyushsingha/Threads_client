@@ -4,15 +4,17 @@ import { useParams } from "react-router-dom";
 import { Spinner } from "@/components/Index";
 import { useDispatch } from "react-redux";
 import TweetCard from "@/components/TweetCard";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useGetTweetByIdQuery } from "@/services/tweetAPI";
 import { useGetTweetRepliesQuery } from "@/services/replyAPI";
 import { setIdParams } from "@/features/authSlice";
+import usePagination from "@/hooks/usePagination";
+import InfiniteScroll from "react-infinite-scroll-component";
+import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
 
 const TweetDetails = () => {
-  // const { toast } = useToast();
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { incrementPage } = usePagination();
 
   const {
     data: tweetDetails,
@@ -23,6 +25,7 @@ const TweetDetails = () => {
     data: tweetReplies,
     isLoading: isTweetRepliesLoading,
     isError: isTweetRepliesError,
+    error,
   } = useGetTweetRepliesQuery(id);
 
   useEffect(() => {
@@ -51,27 +54,14 @@ const TweetDetails = () => {
         <p className="font-3xl font-bold ">Replies</p>
       </div>
       <hr />
-      {
-        isTweetRepliesLoading ? (
-          <Spinner />
-        ) : // <InfiniteScroll
-        //   dataLength={tweetReplies.length}
-        //   next={handleFetchComments}
-        //   hasMore={hasNextPage}
-        //   loader={<Spinner className="text-center" />}
-        // >
-        // {
-
-        tweetReplies?.length > 0 ? (
-          tweetReplies.map((comment) => (
-            <TweetCard key={comment._id} tweet={comment} />
-          ))
-        ) : (
-          <p>Be the first to add a comment</p>
-        )
-        // }
-        // </InfiniteScroll>
-      }
+      <InfiniteScrollTemplate
+        data={tweetReplies?.replies}
+        isLoading={isTweetRepliesLoading}
+        isError={isTweetRepliesError}
+        error={error}
+        totalTweets={tweetReplies?.totalReplies}
+        hasNextPage={tweetReplies?.hasNextPage}
+      />
     </>
   );
 };

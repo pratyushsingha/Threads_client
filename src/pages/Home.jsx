@@ -54,7 +54,9 @@ const Home = () => {
         </Dialog>
       </div>
       <hr />
-      <Outlet />
+      <div className="overflow-y-auto">
+        <Outlet />
+      </div>
     </>
   );
 };
