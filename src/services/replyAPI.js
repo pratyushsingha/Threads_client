@@ -28,15 +28,14 @@ export const replyApi = createApi({
         formData.append("content", data.content);
         formData.append("tags", data.tags);
         formData.append("isAnonymous", data.isAnonymous);
+        data.images.forEach((image) => {
+          formData.append("images", image.file);
+        });
 
         return {
           url: `/tweet/reply/${tweetId}`,
           method: "POST",
-          headers: {
-            Accept: "application/json",
-          },
           body: formData,
-          formData: true,
         };
       },
       async onQueryStarted(
@@ -71,25 +70,6 @@ export const replyApi = createApi({
                 }
               }
             )
-          ),
-          dispatch(
-            replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
-              draft.replies.push({
-                ...data,
-                ownerDetails: getState().auth.user,
-                updatedAt: new Date().toISOString(),
-                commentCount: 0,
-                likeCount: 0,
-                isLiked: false,
-                _id: Math.random().toString(),
-              });
-              const tweet = draft.replies.find(
-                (tweet) => tweet._id === tweetId
-              );
-              if (tweet) {
-                tweet.commentCount += 1;
-              }
-            })
           ),
           dispatch(
             tweetApi.util.updateQueryData(
@@ -143,7 +123,26 @@ export const replyApi = createApi({
           ),
         ];
         try {
-          await queryFulfilled;
+          const newReply = await queryFulfilled;
+          dispatch(
+            replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
+              if (id === tweetId) {
+                draft.replies.unshift({
+                  ...newReply.data.data,
+                  ownerDetails: getState().auth.user,
+                  commentCount: 0,
+                  likeCount: 0,
+                  isLiked: false,
+                });
+              }
+              const tweet = draft.replies.find(
+                (tweet) => tweet._id === tweetId
+              );
+              if (tweet) {
+                tweet.commentCount += 1;
+              }
+            })
+          );
         } catch (error) {
           console.error("Error in query:", error);
           patchUpdate.forEach((update) => update.undo());

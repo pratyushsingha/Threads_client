@@ -15,18 +15,13 @@ const InfiniteScrollTemplate = ({
 
   if (isLoading) return <Spinner />;
 
-  if (isError) return <p>{error.status || "something went wrong"}</p>;
+  if (isError) return <p>{error || "something went wrong"}</p>;
   return (
     <InfiniteScroll
       dataLength={totalTweets}
       next={incrementPage}
       hasMore={hasNextPage}
       loader={<Spinner />}
-      endMessage={
-        <p style={{ textAlign: "center" }}>
-          <b>Yay! You have seen it all</b>
-        </p>
-      }
     >
       {data?.map((tweet) => (
         <section key={tweet._id}>

@@ -9,7 +9,7 @@ const LikedTweets = () => {
     isLoading,
     isError,
     error,
-  } = useGetLikedTweetsQuery(currentPage);
+  } = useGetLikedTweetsQuery(page);
 
   return (
     <InfiniteScrollTemplate

@@ -38,12 +38,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -58,19 +56,15 @@ const profileSchema = z.object({
     ),
   bio: z.string(),
   portfolio: z.string().url("Portfolio must be a valid URL"),
-  avatar: z
-    .instanceof(File)
-    .refine((file) => file.startsWith("image/"), "File must be an image"),
+  avatar: z.any().optional(),
 });
 
 const Profile = () => {
-  const hiddenInputRef = useRef(null);
+  const avatarRef = useRef(null);
   const { toast } = useToast();
   const location = useLocation();
   const { username } = useParams();
   const dispatch = useDispatch();
-  const [preview, setPreview] = useState(null);
-  const [avatar, setAvatar] = useState(null);
   const [handleFollow] = useHandleFollowMutation();
   const { data: user } = useGetCurrentUserQuery();
   const {
@@ -85,7 +79,6 @@ const Profile = () => {
     register,
     handleSubmit,
     formState: { errors, isDirty, isTouched, isSubmitting, isSubmitSuccessful },
-    watch,
     setValue,
   } = useForm({
     defaultValues: {
@@ -94,11 +87,10 @@ const Profile = () => {
       tags: "",
       bio: "",
       portfolio: "",
-      avatar: "",
+      avatar: null,
     },
     resolver: zodResolver(profileSchema),
   });
-  console.log(userProfile);
 
   const oldUserDetails = () => {
     setValue("firstName", userProfile?.fullName.split(" ")[0]);
@@ -106,21 +98,22 @@ const Profile = () => {
     setValue("tags", userProfile?.tags);
     setValue("bio", userProfile?.bio);
     setValue("portfolio", userProfile?.portfolio);
-    setValue("avatar", userProfile?.avatar);
   };
 
   const handleUpdateProfile = async (data) => {
     try {
+      console.log(data);
       const formData = new FormData();
-      formData.append("fullName", `${data.firstName} ${data.lastName}`);
+      formData.append("firstName", data.firstName);
+      formData.append("lastName", data.lastName);
       formData.append("tags", data.tags);
       formData.append("bio", data.bio);
       formData.append("portfolio", data.portfolio);
-      formData.append("avatar", data.avatar[0]);
-
-      console.log(data);
-
+      // if (data.avatar && data.avatar[0]) {
+      formData.append("avatar", data.avatar);
+      // }
       await updateProfile(formData).unwrap();
+
       toast({
         title: "Profile updated successfully",
       });
@@ -133,20 +126,11 @@ const Profile = () => {
     }
   };
 
-  if (profileDetailsError) return <p>Something went wrong </p>;
-
   useEffect(() => {
     dispatch(setUsernameParams(username));
-  }, []);
+  }, [username, dispatch]);
 
-  // useEffect(() => {
-  //   if (avatar) {
-  //     const imageUrl = URL.createObjectURL(avatar[0]);
-  //     setAvatar(imageUrl);
-  //   } else {
-  //     setAvatar(userProfile?.avatar);
-  //   }
-  // }, [avatar, userProfile]);
+  if (profileDetailsError) return <p>Something went wrong</p>;
 
   if (profileDetailsLoading) {
     return <Spinner />;
@@ -159,16 +143,15 @@ const Profile = () => {
             <p className="text-md font-medium mb-10">
               @{userProfile?.username}
             </p>
-            <p className="text-sm">{userProfile?.bio} </p>
+            <p className="text-sm">{userProfile?.bio}</p>
             <p className="mt-5 text-slate-500 text-sm">
               {userProfile?.followersCount} followers
             </p>
           </div>
-          <img
-            className="w-20 h-20 rounded-full"
-            src={userProfile?.avatar}
-            alt={userProfile?.username}
-          />
+          <Avatar className="w-20 h-20 rounded-full">
+            <AvatarImage src={userProfile?.avatar} />
+            <AvatarFallback>{userProfile?.username}</AvatarFallback>
+          </Avatar>
         </div>
         {userProfile?._id === user?._id ? (
           <Dialog>
@@ -200,43 +183,53 @@ const Profile = () => {
                           {errors.firstName?.message}
                         </p>
                       </div>
-                      <div>
-                        {/* <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <Avatar className="w-16 h-16">
-                              <AvatarImage src={userProfile?.avatar} />
-                              <AvatarFallback>
-                                {userProfile.username}
-                              </AvatarFallback>
-                            </Avatar>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="mr-16">
-                            <DropdownMenuItem> */}
-                        {/* <Button
-                                onClick={onUpload}
-                                className="font-bold w-full text-start"
-                                variant="ghost"
-                              >
-                                Upload Profile Picture
-                              </Button> */}
-                        <input
-                          accept="image/png, image/jpg, image/jpeg"
-                          // className="hidden"
-                          type="file"
-                          {...register("avatar")}
-                        />
-                        {/* </DropdownMenuItem> */}
-                        {/* <DropdownMenuItem>
-                              <Button
-                                className="text-red-500 font-bold"
-                                variant="ghost"
-                              >
-                                Remove current Picture
-                              </Button>
-                            </DropdownMenuItem> */}
-                        {/* </DropdownMenuContent> */}
-                        {/* </DropdownMenu> */}
-                      </div>
+                      {/* <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Avatar className="w-20 h-20">
+                            <AvatarImage src={userProfile?.avatar} />
+                            <AvatarFallback>
+                              {userProfile?.username}
+                            </AvatarFallback>
+                          </Avatar>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>
+                            <input
+                              accept="image/png, image/jpg, image/jpeg"
+                              type="file"
+                              className="hidden"
+                              // {...register("avatar")}
+                              ref={avatarRef}
+                              onChange={() => {
+                                const file = avatarRef.current.files[0];
+                                if (file) {
+                                  setValue("avatar", file);
+                                }
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                avatarRef.current.click();
+                              }}
+                              className="font-bold w-full text-start"
+                              variant="ghost"
+                            >
+                              Upload Profile Picture
+                            </Button>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            {/* <Button
+                              type="button"
+                              className="text-red-500 font-bold"
+                              variant="ghost"
+                            >
+                              Remove current Picture
+                            </Button> */}
+                      {/* </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu> */}
                     </div>
                     <InputDiv
                       label="Last Name"
@@ -263,7 +256,18 @@ const Profile = () => {
                       {...register("portfolio")}
                     />
                     <p className="text-red-600">{errors.portfolio?.message}</p>
-
+                    <InputDiv
+                      label="Avatar"
+                      accept="image/png, image/jpg, image/jpeg"
+                      type="file"
+                      ref={avatarRef}
+                      onChange={() => {
+                        const file = avatarRef.current.files[0];
+                        if (file) {
+                          setValue("avatar", file);
+                        }
+                      }}
+                    />
                     <div>
                       <Button
                         disabled={isSubmitting || (!isDirty && !isTouched)}
