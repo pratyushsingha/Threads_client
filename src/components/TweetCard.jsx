@@ -32,8 +32,28 @@ import {
 import { useToggleBookmarkMutation } from "@/services/tweetAPI";
 
 const TweetCard = ({ tweet }) => {
+  const imageScrollRef = useRef(null);
   const dispatch = useDispatch();
   const [toggleBookmark] = useToggleBookmarkMutation();
+
+  useEffect(() => {
+    const handleScroll = (e) => {
+      e.preventDefault();
+      if (imageScrollRef.current) {
+        imageScrollRef.current.scrollLeft += e.deltaY;
+      }
+    };
+
+    const container = imageScrollRef.current;
+
+    if (container) {
+      container.addEventListener("wheel", handleScroll, { passive: false });
+
+      return () => {
+        container.removeEventListener("wheel", handleScroll);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(setTweetBoxType("replyOnTweet"));
@@ -65,7 +85,7 @@ const TweetCard = ({ tweet }) => {
               )}
 
               <span className="ml-2 inline-block text-sm text-gray-400">
-                {moment(tweet.updatedAt, "YYYYMMDD").fromNow()}
+                {moment(tweet.updatedAt).fromNow()}
               </span>
             </div>
             <DropdownMenu>
@@ -99,14 +119,17 @@ const TweetCard = ({ tweet }) => {
           </div>
           <Link to={`/tweet/${tweet._id}`}>
             <p className="mb-4 text-sm sm:text-base">{tweet.content}</p>
-            <div className="mb-4 grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
+            <div
+              ref={imageScrollRef}
+              className="mb-4 flex space-x-3 w-full overflow-x-scroll hide-scrollbar"
+            >
               {tweet.images &&
                 tweet.images.map((image, index) => (
                   <img
                     key={index}
                     src={image}
                     alt={image}
-                    className="rounded-md"
+                    className="rounded-md w-6/12"
                   />
                 ))}
             </div>

@@ -1,22 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-
-import {
-  Button,
-  Label,
-  Separator,
-  useToast,
-  Switch,
-  Spinner,
-  Input,
-} from "./Index";
+import { Button, Label, Separator, useToast, Switch, Input } from "./Index";
 import { Hash, Image, SmilePlus } from "lucide-react";
-import EmojiPicker from "emoji-picker-react";
-import { useForm } from "react-hook-form";
+import Picker from "emoji-picker-react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useCreateTweetMutation } from "@/services/tweetAPI";
 import { useReplyOnTweetMutation } from "@/services/replyAPI";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const TweetBox = ({ formType, id }) => {
   const imagesRef = useRef(null);
@@ -24,8 +16,6 @@ const TweetBox = ({ formType, id }) => {
   const [openImoji, setOpenImoji] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [tagClick, setTagClick] = useState(false);
-  const [previewImages, setPreviewImages] = useState([]);
-  const [multipleImages, setMultipleImages] = useState();
   const [loading, setLoading] = useState(false);
   const { user } = useSelector((store) => store.auth);
   const { tweetBoxType } = useSelector((store) => store.tweet);
@@ -33,8 +23,11 @@ const TweetBox = ({ formType, id }) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isDirty, isTouched, isSubmitSuccessful },
     reset,
+    setValue,
+    watch,
   } = useForm({
     defaultValues: {
       content: "",
@@ -43,51 +36,46 @@ const TweetBox = ({ formType, id }) => {
     },
   });
 
+  const { fields, append } = useFieldArray({
+    control,
+    name: "images",
+    keyName: "imageId",
+  });
+
+  const onAddImages = () => {
+    imagesRef.current.click();
+  };
+
   const [createTweet, { isLoading: isCreating }] = useCreateTweetMutation();
   const [replyOnTweet, { isLoading: isPosting }] = useReplyOnTweetMutation(id);
 
   const handleMultipleImages = (e) => {
     if (e.target.files) {
-      setMultipleImages(e.target.files);
-      const imgArr = Array.from(e.target.files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setPreviewImages((prevImg) => prevImg.concat(imgArr));
+      const files = Array.from(e.target.files).map((file) => ({
+        file,
+      }));
+
+      append(files);
+      imagesRef.current.value = "";
     }
   };
 
   const toggleAnonymous = (value) => {
     setIsAnonymous(value);
-    if (value === true) {
-      toast({
-        title: "Tweet set to anonymous",
-        status: "success",
-      });
-    } else {
-      toast({
-        title: "Tweet set to public",
-        status: "success",
-      });
-    }
-  };
-
-  const render = (data) => {
-    return (
-      <div className="mb-4 flex overflow-x-auto gap-4">
-        {data.map((image, index) => (
-          <img key={index} src={image} alt={image} className="rounded-md w-2/4 h-2/4" />
-        ))}
-      </div>
-    );
+    toast({
+      title: `Tweet set to ${value ? "anonymous" : "public"}`,
+      status: "success",
+    });
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful)
+    if (isSubmitSuccessful) {
       reset({
         content: "",
         tags: "",
         images: [],
       });
+    }
   }, [isSubmitSuccessful]);
 
   const handleCreateTweet = async (data) => {
@@ -107,13 +95,14 @@ const TweetBox = ({ formType, id }) => {
         data: { ...data, isAnonymous },
         tweetId: id,
       }).unwrap();
+
       toast({
-        title: "reply posted",
+        title: "New Reply Posted",
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "something went wrong while repling on tweet",
+        title: "Something went wrong while replying on tweet",
       });
     }
   };
@@ -126,23 +115,27 @@ const TweetBox = ({ formType, id }) => {
     }
   };
 
+  const onEmojiClick = (data) => {
+    const content = watch("content");
+    setValue("content", content + data.emoji);
+  };
+
   return (
     <form onSubmit={handleSubmit(submitHandler)}>
       <div className="relative flex-col rounded px-2 py-2 my-4">
         <div className="flex space-x-5 w-full ">
           <div className="self-center">
             <Link to={`/profile/${user.username}`}>
-              <img
-                className="h-10 w-10 shrink-0 sm:h-12 sm:w-12 rounded-full"
-                src={user.avatar}
-                alt=""
-              />
+              <Avatar>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{user.username}</AvatarFallback>
+              </Avatar>
             </Link>
           </div>
           <div className="w-full relative">
             <textarea
               className="py-5 text-pretty text-xl border-none focus:border-none bg-black w-full focus:outline-none"
-              placeholder="what is happening?!"
+              placeholder="What is happening?!"
               {...register("content", {
                 required: true,
               })}
@@ -154,10 +147,30 @@ const TweetBox = ({ formType, id }) => {
               }`}
               {...register("tags")}
             />
-            {render(previewImages)}
+            <div className="mb-4 flex space-x-3 w-full overflow-x-scroll hide-scrollbar">
+              {fields.map(({ imageId, file }, index) => (
+                <Controller
+                  key={imageId}
+                  control={control}
+                  name={`images.${index}`}
+                  render={() => (
+                    <div className="mb-4">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="rounded-md "
+                      />
+                    </div>
+                  )}
+                />
+              ))}
+            </div>
             {openImoji && (
               <div className="absolute top-52 left-0 z-50">
-                <EmojiPicker className="object-cover" theme="dark" />
+                <Picker
+                  onEmojiClick={onEmojiClick}
+                  className="object-cover"
+                  theme="dark"
+                />
               </div>
             )}
           </div>
@@ -166,11 +179,7 @@ const TweetBox = ({ formType, id }) => {
         <div className="mx-4 flex justify-between">
           <div>
             <Label htmlFor="imageUpload">
-              <Button
-                onClick={() => imagesRef.current.click()}
-                type="button"
-                variant="ghost"
-              >
+              <Button onClick={onAddImages} type="button" variant="ghost">
                 <Image color="#1a8cd8" />
               </Button>
             </Label>
@@ -181,16 +190,19 @@ const TweetBox = ({ formType, id }) => {
               type="file"
               accept="image/png, image/jpg, image/jpeg"
               multiple
-              // {...register("images")}
-              onChange={(e) => handleMultipleImages(e)}
+              onChange={handleMultipleImages}
             />
-            <Button onClick={() => setOpenImoji(!openImoji)} variant="ghost">
+            <Button
+              type="button"
+              onClick={() => setOpenImoji(!openImoji)}
+              variant="ghost"
+            >
               <SmilePlus color="#1a8cd8" />
             </Button>
             <Button type="button" variant="ghost">
               <Switch
                 defaultChecked={false}
-                onCheckedChange={(value) => toggleAnonymous(value)}
+                onCheckedChange={toggleAnonymous}
               />
             </Button>
 
@@ -203,10 +215,9 @@ const TweetBox = ({ formType, id }) => {
             </Button>
           </div>
           <Button disabled={!isDirty && !isTouched} type="submit">
-            {isCreating ||
-              (isPosting && (
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-              ))}
+            {(isCreating || isPosting) && (
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            )}
             Post
           </Button>
         </div>

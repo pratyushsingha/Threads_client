@@ -8,17 +8,7 @@ const CommentBox = ({ type, data }) => {
   return (
     <>
       <Tweet tweet={data} />
-      <div>
-        <div className="flex self-center space-x-3">
-          <img
-            src={user.avatar}
-            alt={user.username}
-            className="w-12 h-12 rounded-full"
-          />
-          <p>{user.username}</p>
-        </div>
-        <TweetBox formType={type} id={data._id} />
-      </div>
+      <TweetBox formType={type} id={data._id} />
     </>
   );
 };

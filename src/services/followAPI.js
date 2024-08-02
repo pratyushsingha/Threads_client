@@ -16,20 +16,24 @@ export const followApi = createApi({
     }),
     updateUserDetails: builder.mutation({
       query: (data) => {
-        // data should be an instance of FormData
         return {
           url: `/users/profile`,
           method: "PATCH",
-          headers: {
-            // Accept: "application/json",
-            "Content-Type": "multipart/form-data;",
-          },
           body: data,
         };
       },
-      invalidatesTags: ["userProfile"], // This will re-fetch the user profile data upon mutation success
+      invalidatesTags: ["userProfile"],
     }),
-
+    updateAvatar: builder.mutation({
+      query: (data) => {
+        return {
+          url: "users/avatar",
+          method: "PATCH",
+          body: data,
+        };
+      },
+      transformResponse: (response) => response.data,
+    }),
     handleFollow: builder.mutation({
       query: ({ followerId }) => ({
         url: `/follow/${followerId}`,
@@ -89,4 +93,5 @@ export const {
   useGetUserProfileDetailsQuery,
   useHandleFollowMutation,
   useUpdateUserDetailsMutation,
+  useUpdateAvatarMutation,
 } = followApi;

@@ -26,7 +26,7 @@ export const tweetApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BACKEND_URL,
     credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers) => {
       return headers;
     },
   }),
@@ -57,22 +57,44 @@ export const tweetApi = createApi({
         formData.append("content", data.content);
         formData.append("tags", data.tags);
         formData.append("isAnonymous", data.isAnonymous);
-        // for (let i = 0; i < data.images.length; i++) {
-        //   formData.append("images", data.images[i]);
-        // }
+        data.images.forEach((image) => {
+          formData.append("images", image.file);
+        });
+
         return {
           url: "/tweet",
           method: "POST",
-          headers: {
-            Accept: "application/json",
-            // "Content-Type": "multipart/form-data;",
-          },
           body: formData,
-          formData: true,
         };
       },
-      invalidatesTags: ["tweets"],
+
+      async onQueryStarted(data, { dispatch, queryFulfilled, getState }) {
+        try {
+          const response = await queryFulfilled;
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getFeedTweets",
+              undefined,
+              (tweets) => {
+                tweets.tweets.unshift({
+                  ...response.data.data,
+                  isLiked: false,
+                  isBookmarked: false,
+                  isReposted: false,
+                  likeCount: 0,
+                  commentCount: 0,
+                  ownerDetails: getState().auth.user,
+                });
+              }
+            )
+          );
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      // invalidatesTags: ["tweets"],
     }),
+
     getLikedTweets: builder.query({
       query: (page = 1) => `/like/tweets?page=${page}&limit=20`,
       providesTags: ["likedTweets"],
@@ -149,7 +171,9 @@ export const tweetApi = createApi({
               "getLikedTweets",
               undefined,
               (tweets) => {
-                updateLikedTweet(tweets.tweets, tweetId);
+                tweets.tweets = tweets.tweets.filter(
+                  (tweet) => tweet._id !== tweetId
+                );
               }
             )
           ),
@@ -267,7 +291,9 @@ export const tweetApi = createApi({
               "getBookmarkedTweets",
               undefined,
               (tweets) => {
-                updateBookmarkedTweet(tweets.tweets, tweetId);
+                tweets.tweets = tweets.tweets.filter(
+                  (tweet) => tweet._id !== tweetId
+                );
               }
             )
           ),

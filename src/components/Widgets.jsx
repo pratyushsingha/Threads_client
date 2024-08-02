@@ -54,6 +54,8 @@ const Widgets = ({ data, type }) => {
     }
   };
 
+  
+
   return (
     <div className="flex space-x-1 md:space-x-1 ">
       <Button
