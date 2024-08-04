@@ -3,9 +3,11 @@ import { Spinner } from "@/components/Index";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGetAllActivitiesQuery } from "@/services/activityAPI";
 import Pusher from "pusher-js";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { setActivitiesPage } from "@/features/paginationSlice";
 
 const activityType = new Map([
   ["like", "Liked your tweet"],
@@ -15,18 +17,20 @@ const activityType = new Map([
 ]);
 
 const ActivityPage = () => {
+  const { activitiesPage } = useSelector((store) => store.pagination);
   const [allActivities, setAllActivities] = useState([]);
   const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
   const {
     data: activities,
     isLoading: activitiesLoading,
     isError: activitiesError,
-  } = useGetAllActivitiesQuery();
+  } = useGetAllActivitiesQuery(activitiesPage);
 
   useEffect(() => {
     if (activities) {
-      setAllActivities(activities);
+      setAllActivities(activities.activities);
     }
   }, [activities]);
 
@@ -60,41 +64,55 @@ const ActivityPage = () => {
 
   return (
     <section className="p-5">
-      {allActivities?.length > 0 ? (
-        allActivities?.map((activity) => (
-          <Link
-            to={`${
-              activity.activityType === "like" ||
-              activity.activityType === "reply" ||
-              activity.activityType === "repost"
-                ? `/tweet/${activity.pathId}`
-                : `/profile/${activity.triggeredBy.username}`
-            }`}
-            key={activity._id}
-          >
-            <div className="flex space-x-2 mt-4">
-              <Avatar>
-                <AvatarImage src={activity.triggeredBy.avatar} />
-                <AvatarFallback>{activity.triggeredBy.username}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex space-x-3">
-                  <p className="font-bold">{activity.triggeredBy.username}</p>
-                  <p className="self-center text-xs text-slate-500">
-                    {moment(activity.createdAt).fromNow()}
+      <InfiniteScroll
+        dataLength={activities.activities.length}
+        next={() => dispatch(setActivitiesPage())}
+        hasMore={activities?.hasNextPage}
+        loader={<Spinner />}
+        endMessage={
+          <p style={{ textAlign: "center" }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
+        {allActivities?.length > 0 ? (
+          allActivities?.map((activity) => (
+            <Link
+              to={`${
+                activity.activityType === "like" ||
+                activity.activityType === "reply" ||
+                activity.activityType === "repost"
+                  ? `/tweet/${activity.pathId}`
+                  : `/profile/${activity.triggeredBy.username}`
+              }`}
+              key={activity._id}
+            >
+              <div className="flex space-x-2 mt-4">
+                <Avatar>
+                  <AvatarImage src={activity.triggeredBy.avatar} />
+                  <AvatarFallback>
+                    {activity.triggeredBy.username}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex space-x-3">
+                    <p className="font-bold">{activity.triggeredBy.username}</p>
+                    <p className="self-center text-xs text-slate-500">
+                      {moment(activity.createdAt).fromNow()}
+                    </p>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-5">
+                    {activityType.get(activity.activityType)}
                   </p>
                 </div>
-                <p className="text-sm text-slate-500 mb-5">
-                  {activityType.get(activity.activityType)}
-                </p>
               </div>
-            </div>
-            <hr />
-          </Link>
-        ))
-      ) : (
-        <p>No activity found</p>
-      )}
+              <hr />
+            </Link>
+          ))
+        ) : (
+          <p>No activity found</p>
+        )}
+      </InfiniteScroll>
     </section>
   );
 };

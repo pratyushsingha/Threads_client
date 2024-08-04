@@ -1,15 +1,17 @@
 import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
+import { setLikedTweetsPage } from "@/features/paginationSlice";
 import { useGetLikedTweetsQuery } from "@/services/tweetAPI";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const LikedTweets = () => {
-  const { page } = useSelector((store) => store.tweet);
+  const { likedTweetsPage } = useSelector((store) => store.pagination);
+  const dispatch = useDispatch();
   const {
     data: likedTweets,
     isLoading,
     isError,
     error,
-  } = useGetLikedTweetsQuery(page);
+  } = useGetLikedTweetsQuery(likedTweetsPage);
 
   return (
     <InfiniteScrollTemplate
@@ -19,6 +21,7 @@ const LikedTweets = () => {
       error={error}
       totalTweets={likedTweets?.totalTweets}
       hasNextPage={likedTweets?.hasNextPage}
+      next={() => dispatch(setLikedTweetsPage())}
     />
   );
 };

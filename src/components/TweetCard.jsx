@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import {useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { Heart, Bookmark, Share2, MessageCircle, Copy } from "lucide-react";

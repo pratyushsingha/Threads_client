@@ -8,8 +8,8 @@ export const activityApi = createApi({
   }),
   endpoints: (builder) => ({
     getAllActivities: builder.query({
-      query: () => "/",
-      transformResponse: (response) => response.data.activities,
+      query: (page) => `?page=${page}&limit=20`,
+      transformResponse: (response) => response.data,
     }),
   }),
 });

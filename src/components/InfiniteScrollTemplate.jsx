@@ -1,4 +1,3 @@
-import usePagination from "@/hooks/usePagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spinner } from "./Index";
 import TweetCard from "./TweetCard";
@@ -8,20 +7,23 @@ const InfiniteScrollTemplate = ({
   isLoading,
   isError,
   error,
-  totalTweets,
   hasNextPage,
+  next,
 }) => {
-  const { incrementPage } = usePagination();
-
   if (isLoading) return <Spinner />;
 
   if (isError) return <p>{error || "something went wrong"}</p>;
   return (
     <InfiniteScroll
-      dataLength={totalTweets}
-      next={incrementPage}
+      dataLength={data?.length}
+      next={next}
       hasMore={hasNextPage}
       loader={<Spinner />}
+      endMessage={
+        <p className="my-3 flex justify-center">
+          <b>Yay! You have seen it all</b>
+        </p>
+      }
     >
       {data?.map((tweet) => (
         <section key={tweet._id}>

@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <Container className="h-screen flex flex-col">
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex">
           <div className="hidden md:block md:w-1/4 lg:w-1/5 xl:w-1/6 h-full">
             <Sidebar />
           </div>

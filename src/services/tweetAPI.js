@@ -91,8 +91,8 @@ export const tweetApi = createApi({
         } catch (error) {
           console.error(error);
         }
+        dispatch(tweetApi.util.invalidateTags(["myTweets", "publicTweets"]));
       },
-      // invalidatesTags: ["tweets"],
     }),
 
     getLikedTweets: builder.query({
@@ -376,7 +376,7 @@ export const tweetApi = createApi({
     }),
 
     getMyTweets: builder.query({
-      query: (username, page) =>
+      query: ({ username, page }) =>
         `/tweet/tweets/${username}?page=${page}&limit=20`,
       providesTags: ["myTweets"],
       serializeQueryArgs: ({ page }) => page,
@@ -389,8 +389,8 @@ export const tweetApi = createApi({
       transformResponse: (response) => response.data,
     }),
     getPublicTweets: builder.query({
-      query: (username, page) => `/tweet/${username}?page=${page}&limit=20`,
-      providesTags: "publicTweets",
+      query: ({ username, page }) => `/tweet/${username}?page=${page}&limit=20`,
+      providesTags: ["publicTweets"],
       serializeQueryArgs: (args) => args,
       merge: (currentCache, newTweets) => {
         currentCache.tweets.push(...newTweets.tweets);
