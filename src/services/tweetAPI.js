@@ -96,7 +96,7 @@ export const tweetApi = createApi({
     }),
 
     getLikedTweets: builder.query({
-      query: (page = 1) => `/like/tweets?page=${page}&limit=20`,
+      query: (page) => `/like/tweets?page=${page}&limit=20`,
       providesTags: ["likedTweets"],
       serializeQueryArgs: ({ page }) => page,
       merge: (currentCache, newTweets) => {
@@ -125,6 +125,16 @@ export const tweetApi = createApi({
               undefined,
               (tweets) => {
                 updateLikedTweet(tweets.tweets, tweetId);
+              }
+            )
+          ),
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getFollowingUserTweets",
+              undefined,
+              (tweets) => {
+                console.log(tweets)
+                // updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -236,6 +246,16 @@ export const tweetApi = createApi({
             replyApi.util.updateQueryData("getTweetReplies", id, (draft) => {
               updateLikedTweet(draft.replies, tweetId);
             })
+          ),
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getFollowingUserTweets",
+              undefined,
+              (tweets) => {
+                console.log(tweets);
+                // updateLikedTweet(tweets.followingTweets, tweetId);
+              }
+            )
           ),
         ];
 
@@ -404,6 +424,17 @@ export const tweetApi = createApi({
       query: (tweetId) => `/tweet/tweet/${tweetId}`,
       transformResponse: (response) => response.data,
     }),
+    getFollowingUserTweets: builder.query({
+      query: (page) => `/tweet/following?page=${page}&limit=20`,
+      serializeQueryArgs: (args) => args,
+      merge: (currentCache, newTweets) => {
+        currentCache.followingTweets.push(...newTweets.followingTweets);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg !== previousArg;
+      },
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -417,4 +448,5 @@ export const {
   useCreateTweetMutation,
   useToggleLikeMutation,
   useToggleBookmarkMutation,
+  useGetFollowingUserTweetsQuery,
 } = tweetApi;
