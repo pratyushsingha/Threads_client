@@ -16,37 +16,29 @@ const AuthLayout = () => {
     isLoading: authLoading,
     isError: authError,
   } = useCheckAuthStatusQuery();
-  const 
-    {
-      data: currentUser,
-      isLoading: currentUserLoading,
-      isError: currentUserError,
-    }
-   = useGetCurrentUserQuery();
+  const {
+    data: currentUser,
+    isLoading: currentUserLoading,
+    isError: currentUserError,
+  } = useGetCurrentUserQuery();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!authLoading) {
-      if (authStatus?.isAuthenticated) {
-        
-      } else if (location.pathname !== "/login") {
+      if (authStatus?.isAuthenticated && location.pathname === "/login") {
+        navigate("/");
+      } else if (
+        !authStatus?.isAuthenticated &&
+        location.pathname !== "/login"
+      ) {
         navigate("/login");
       }
     }
-  }, [
-    authLoading,
-    authStatus,
-    location.pathname,
-    navigate,
-    ,
-  ]);
+  }, [authLoading, authStatus, location.pathname, navigate, ,]);
 
   useEffect(() => {
     if (currentUser) {
       dispatch(setAuthState({ user: currentUser, token: authStatus?.token }));
-      if (location.pathname === "/login") {
-        navigate("/");
-      }
     }
   }, [currentUser, dispatch, location.pathname, navigate, authStatus]);
 

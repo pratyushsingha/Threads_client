@@ -58,16 +58,8 @@ const Login = () => {
 
   const handleLogin = async (data) => {
     try {
-      const response = await login(data).unwrap();
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      dispatch(
-        setAuthState({
-          token: response.data.accessToken,
-          user: response.data.user,
-        })
-      );
+      await login(data).unwrap();
       navigate("/");
-      // localStorage.setItem("user", JSON.stringify(response.data.user));
 
       toast({
         title: `Welcome back ${data.username}`,
