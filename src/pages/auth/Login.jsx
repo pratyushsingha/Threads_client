@@ -59,7 +59,6 @@ const Login = () => {
   const handleLogin = async (data) => {
     try {
       const response = await login(data).unwrap();
-      localStorage.setItem("token", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       dispatch(
         setAuthState({
@@ -68,13 +67,15 @@ const Login = () => {
         })
       );
       navigate("/");
+      // localStorage.setItem("user", JSON.stringify(response.data.user));
+
       toast({
         title: `Welcome back ${data.username}`,
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: error.data.message,
+        title: error.data?.message || error.status,
       });
     }
   };
@@ -83,7 +84,7 @@ const Login = () => {
     <Container className="flex justify-center items-center mt-20">
       <Card className="w-[400px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">DevCom</CardTitle>
+          <CardTitle className="text-2xl">Threads</CardTitle>
           <CardDescription>Sign in to your account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,15 +119,15 @@ const Login = () => {
             </div>
 
             <p className="text-red-600">{errors.password?.message}</p>
-            <div className="text-sm">
+            {/* <div className="text-sm">
               <Link
                 to="/forget-password"
                 className="flex justify-end font-semibold text-indigo-600 hover:text-indigo-500"
               >
                 Forget password?
               </Link>
-            </div>
-            <div className="flex items-center space-x-2">
+            </div> */}
+            {/* <div className="flex items-center space-x-2">
               <Checkbox
                 defaultChecked={true}
                 onCheckedChange={(value) => setRememberMe(value)}
@@ -138,13 +139,13 @@ const Login = () => {
               >
                 Remember me
               </label>
-            </div>
+            </div> */}
             <div>
               <Button disabled={isSubmitting} className="w-full">
                 {isLoading && (
                   <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                login
+                Login
               </Button>
             </div>
           </form>
@@ -153,6 +154,15 @@ const Login = () => {
             <span className="text-gray-400">or</span>
             <Separator className="w-32" />
           </div>
+          <Link
+            to={`${
+              import.meta.env.VITE_BACKEND_URL
+            }/users/login/federated/google`}
+          >
+            <Button variant="outline" className="w-full">
+              Login with Google
+            </Button>
+          </Link>
         </CardContent>
         <CardFooter className="justify-center">
           <p>not a member? </p>

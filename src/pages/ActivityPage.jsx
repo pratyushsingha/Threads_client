@@ -36,7 +36,7 @@ const ActivityPage = () => {
       encrypted: true,
     });
 
-    const channel = pusher.subscribe(`userActivity-${user._id}`);
+    const channel = pusher.subscribe(`userActivity-${user?._id}`);
 
     const handleNewActivity = (data) => {
       setAllActivities((prevActivities) => [data, ...prevActivities]);
@@ -53,7 +53,7 @@ const ActivityPage = () => {
       });
       channel.unsubscribe();
     };
-  }, [user._id]);
+  }, [user?._id]);
 
   if (activitiesLoading) return <Spinner />;
   if (activitiesError) return <p>Something went wrong</p>;

@@ -23,11 +23,11 @@ const Home = () => {
   return (
     <>
       <div className="flex justify-between p-5">
-        <Link to={`/profile/${user.username}`}>
+        <Link to={`/profile/${user?.username}`}>
           <Avatar>
-            <AvatarImage src={user.avatar} />
+            <AvatarImage src={user?.avatar} />
             <AvatarFallback>
-              {user.username.split("")[0].toUpperCase()}
+              {user?.username.split("")[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Link>
