@@ -13,7 +13,7 @@ const Sidebar = () => {
             key={item._id}
             to={
               item.title === "profile"
-                ? `${item.title}/${user.username}`
+                ? `${item.title}/${user?.username}`
                 : `${item.title}`
             }
           >

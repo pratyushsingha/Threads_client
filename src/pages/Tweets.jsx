@@ -37,7 +37,7 @@ const Tweets = () => {
     }
   }, []);
 
-  const tweets = username === user.username ? myTweets : publicTweets;
+  const tweets = username === user?.username ? myTweets : publicTweets;
 
   return (
     tweets && (

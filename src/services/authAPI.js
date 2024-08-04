@@ -16,6 +16,10 @@ export const authApi = createApi({
         transformResponse: (response) => response.data,
       }),
     }),
+    checkAuthStatus: builder.query({
+      query: () => "users/auth/status",
+      transformResponse: (response) => response.data,
+    }),
     getCurrentUser: builder.query({
       query: () => "users/current-user",
       providesTags: ["User"],
@@ -45,4 +49,5 @@ export const {
   useGetCurrentUserQuery,
   useUserSuggetionsQuery,
   useLazySearchUserQuery,
+  useCheckAuthStatusQuery,
 } = authApi;

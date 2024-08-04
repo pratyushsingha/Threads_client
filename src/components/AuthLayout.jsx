@@ -1,29 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { App, Spinner } from "./Index";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import {
+  useCheckAuthStatusQuery,
+  useGetCurrentUserQuery,
+} from "@/services/authAPI";
+import { useDispatch } from "react-redux";
+import { setAuthState } from "@/features/authSlice";
 
 const AuthLayout = () => {
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { token } = useSelector((store) => store.auth);
+  const {
+    data: authStatus,
+    isLoading: authLoading,
+    isError: authError,
+  } = useCheckAuthStatusQuery();
+  const 
+    {
+      data: currentUser,
+      isLoading: currentUserLoading,
+      isError: currentUserError,
+    }
+   = useGetCurrentUserQuery();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const isAuthenticated = !!token;
-
-    if (isAuthenticated && location.pathname === "/login") {
-      navigate("/");
-    } else if (!isAuthenticated && location.pathname !== "/login") {
-      navigate("/login");
+    if (!authLoading) {
+      if (authStatus?.isAuthenticated) {
+        
+      } else if (location.pathname !== "/login") {
+        navigate("/login");
+      }
     }
+  }, [
+    authLoading,
+    authStatus,
+    location.pathname,
+    navigate,
+    ,
+  ]);
 
-    setLoading(false);
-  }, [token, navigate, location.pathname]);
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(setAuthState({ user: currentUser, token: authStatus?.token }));
+      if (location.pathname === "/login") {
+        navigate("/");
+      }
+    }
+  }, [currentUser, dispatch, location.pathname, navigate, authStatus]);
 
-  loading && <Spinner />;
+  if (authLoading || currentUserLoading) return <Spinner />;
+  if (authError || currentUserError) return <p>Something went wrong</p>;
 
-  return <App />;
+  return authStatus?.isAuthenticated ? <App /> : null;
 };
 
 export default AuthLayout;
