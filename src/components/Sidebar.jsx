@@ -7,7 +7,7 @@ const Sidebar = () => {
   const { user } = useSelector((store) => store.auth);
   return (
     <>
-      <div className="flex  md:flex-col justify-between md:justify-center md:items-center md:h-screen md:space-y-5 py-5 px-4">
+      <div className="flex md:fixed md:flex-col justify-between md:justify-center md:items-center md:h-screen md:space-y-5 py-5 px-4">
         {sidebarItems.map((item) => (
           <NavLink
             key={item._id}

@@ -57,7 +57,7 @@ const Home = () => {
       <div className="overflow-y-auto">
         <Outlet />
       </div>
-    </>
+    </>  
   );
 };
 

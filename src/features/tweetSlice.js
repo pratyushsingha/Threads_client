@@ -1,27 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  page: 1,
   tweetBoxType: "tweet",
   homeRoute: "For You",
+  isDialogOpen: false,
 };
 
 export const tweetSlice = createSlice({
   name: "tweets",
   initialState,
   reducers: {
-    setPage: (state) => {
-      state.page += 1;
-    },
     setTweetBoxType: (state, { payload }) => {
       state.tweetBoxType = payload;
     },
     setHomeRoute: (state, { payload }) => {
       state.homeRoute = payload;
     },
+    setIsDialogOpen: (state, { payload }) => {
+      state.isDialogOpen = payload;
+    },
   },
 });
 
-export const { setPage, setTweetBoxType, setHomeRoute } = tweetSlice.actions;
+export const { setTweetBoxType, setHomeRoute, setIsDialogOpen } =
+  tweetSlice.actions;
 
 export default tweetSlice.reducer;

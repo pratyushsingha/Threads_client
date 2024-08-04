@@ -7,14 +7,12 @@ import TweetCard from "@/components/TweetCard";
 import { useGetTweetByIdQuery } from "@/services/tweetAPI";
 import { useGetTweetRepliesQuery } from "@/services/replyAPI";
 import { setIdParams } from "@/features/authSlice";
-import usePagination from "@/hooks/usePagination";
-import InfiniteScroll from "react-infinite-scroll-component";
 import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
+import { setTweetRepliesPage } from "@/features/paginationSlice";
 
 const TweetDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { incrementPage } = usePagination();
 
   const {
     data: tweetDetails,
@@ -61,6 +59,7 @@ const TweetDetails = () => {
         error={error}
         totalTweets={tweetReplies?.totalReplies}
         hasNextPage={tweetReplies?.hasNextPage}
+        next={() => dispatch(setTweetRepliesPage())}
       />
     </>
   );

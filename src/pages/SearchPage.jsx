@@ -6,21 +6,21 @@ import {
 } from "@/services/authAPI";
 import { useDebounce } from "@uidotdev/usehooks";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaChevronRight } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useHandleFollowMutation } from "@/services/followAPI";
 import InfiniteScroll from "react-infinite-scroll-component";
-import usePagination from "@/hooks/usePagination";
+import { setUsersPage } from "@/features/paginationSlice";
 
 const SearchPage = () => {
   const [searchUser, setSearchUser] = useState("");
   const debounceQuery = useDebounce(searchUser, 500);
   const searchInputRef = useRef(null);
   const { user: currentUser } = useSelector((store) => store.auth);
-  const { page } = useSelector((store) => store.tweet);
-  const { incrementPage } = usePagination();
+  const { usersPage } = useSelector((store) => store.pagination);
 
+  const dispatch = useDispatch();
   const [handleFollow] = useHandleFollowMutation();
 
   const [
@@ -36,7 +36,8 @@ const SearchPage = () => {
     data: userSuggestions,
     error: userSuggestionsError,
     isLoading: userSuggestionLoading,
-  } = useUserSuggetionsQuery(page);
+    isFetching,
+  } = useUserSuggetionsQuery(usersPage);
 
   useEffect(() => {
     searchInputRef.current?.focus();
@@ -44,12 +45,11 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (debounceQuery) {
-      trigger({ data: debounceQuery, page });
+      trigger({ data: debounceQuery, page: usersPage });
     }
-  }, [debounceQuery]);
+  }, [debounceQuery, usersPage]);
 
   const users = debounceQuery ? searchedUser : userSuggestions;
-  console.log(users?.totalUsers);
 
   return (
     <section className="p-5">
@@ -64,10 +64,10 @@ const SearchPage = () => {
       {(searchedUserError || userSuggestionsError) && (
         <p>something went wrong</p>
       )}
-      {users && (
+      {!isFetching && (
         <InfiniteScroll
-          dataLength={users?.totalUsers}
-          next={incrementPage}
+          dataLength={users?.users.length}
+          next={() => dispatch(setUsersPage())}
           hasMore={users?.hasNextPage}
           loader={<Spinner />}
           endMessage={

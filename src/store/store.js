@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import authReducer from "../features/authSlice";
 import tweetReducer from "../features/tweetSlice";
+import paginationReducer from "../features/paginationSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { tweetApi } from "@/services/tweetAPI";
 import { repostApi } from "@/services/repostAPI";
@@ -20,6 +21,7 @@ export const store = configureStore({
     [activityApi.reducerPath]: activityApi.reducer,
     auth: authReducer,
     tweet: tweetReducer,
+    pagination: paginationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

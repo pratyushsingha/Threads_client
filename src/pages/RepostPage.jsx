@@ -1,22 +1,21 @@
 import { Spinner } from "@/components/Index";
 import RepostCard from "@/components/RepostCard";
-import usePagination from "@/hooks/usePagination";
+import { setRepostedTweetsPage } from "@/features/paginationSlice";
 import { useGetRepostedTweetsQuery } from "@/services/repostAPI";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const RepostPage = () => {
   const { username } = useParams();
-  const { page } = useSelector((store) => store.tweet);
-  const { incrementPage } = usePagination();
-
+  const { repostedTweetsPage } = useSelector((store) => store.pagination);
+  const dispatch = useDispatch();
   const {
     data: repostTweets,
     isLoading,
     isError,
-  } = useGetRepostedTweetsQuery(username, page);
+  } = useGetRepostedTweetsQuery({ username, page: repostedTweetsPage });
 
   if (isLoading) return <Spinner />;
   if (isError) return <p>something went wrong</p>;
@@ -24,7 +23,7 @@ const RepostPage = () => {
   return repostTweets?.reposts.length > 0 ? (
     <InfiniteScroll
       dataLength={repostTweets?.totalReposts}
-      next={incrementPage}
+      next={() => dispatch(setRepostedTweetsPage())}
       hasMore={repostTweets.hasNextPage}
       loader={<Spinner />}
       endMessage={

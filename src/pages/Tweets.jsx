@@ -1,21 +1,24 @@
 import { useEffect } from "react";
 import { Spinner } from "@/components/Index";
 import { useDispatch, useSelector } from "react-redux";
-import TweetCard from "@/components/TweetCard";
 import { useParams } from "react-router-dom";
 import {
   useLazyGetMyTweetsQuery,
   useLazyGetPublicTweetsQuery,
 } from "@/services/tweetAPI";
-import { CloudHail } from "lucide-react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import usePagination from "@/hooks/usePagination";
 import InfiniteScrollTemplate from "@/components/InfiniteScrollTemplate";
+import {
+  setMyTweetsPage,
+  setPublicTweetsPage,
+} from "@/features/paginationSlice";
 
 const Tweets = () => {
   const { username } = useParams();
   const { user } = useSelector((store) => store.auth);
-  const { page } = useSelector((store) => store.tweet);
+  const { myTweetsPage, publicTweetsPage } = useSelector(
+    (store) => store.pagination
+  );
+  const dispatch = useDispatch();
   const [
     myTweetsTrigger,
     { data: myTweets, isLoading: myTweetsLoading, error: myTweetsError },
@@ -31,13 +34,16 @@ const Tweets = () => {
 
   useEffect(() => {
     if (username == user.username) {
-      myTweetsTrigger(username, page);
+      myTweetsTrigger({ username, page: myTweetsPage });
     } else {
-      publicTweetsTrigger(username, page);
+      publicTweetsTrigger({ username, page: publicTweetsPage });
     }
   }, []);
 
   const tweets = username === user?.username ? myTweets : publicTweets;
+
+  if (myTweetsLoading || publicTweetsLoading) return <Spinner />;
+  if (myTweetsError || publicTweetsError) return <p>something went wrong</p>;
 
   return (
     tweets && (
@@ -47,6 +53,11 @@ const Tweets = () => {
         isError={myTweetsError || publicTweetsError}
         totalTweets={tweets?.totalTweets}
         hasNextPage={tweets?.hasNextPage}
+        next={() =>
+          username === user?.username
+            ? dispatch(setMyTweetsPage())
+            : dispatch(setPublicTweetsPage())
+        }
       />
     )
   );

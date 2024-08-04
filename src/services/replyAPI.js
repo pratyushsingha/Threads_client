@@ -13,7 +13,7 @@ export const replyApi = createApi({
   }),
   endpoints: (builder) => ({
     getRepliedTweets: builder.query({
-      query: (username, page) =>
+      query: ({ username, page }) =>
         `tweet/reply/u/${username}?page=${page}&limit=20`,
       serializeQueryArgs: ({ page }) => page,
       merge: (currentCache, newReplies) => {
