@@ -24,6 +24,7 @@ import ErrorPage from "./pages/ErrorPage";
 import FeedPage from "./pages/FeedPage";
 import SearchPage from "./pages/SearchPage";
 import ActivityPage from "./pages/ActivityPage";
+import FollowingTweetPage from "./pages/FollowingTweetPage";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
           {
             path: "/",
             element: <FeedPage />,
+          },
+          {
+            path: "/following",
+            element: <FollowingTweetPage />,
           },
           {
             path: "/liked",

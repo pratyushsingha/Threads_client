@@ -11,6 +11,7 @@ const initialState = {
   usersPage: 1,
   tweetRepliesPage: 1,
   activitiesPage: 1,
+  followingUsersTweetsPage: 1,
 };
 
 export const paginationSlice = createSlice({
@@ -47,6 +48,9 @@ export const paginationSlice = createSlice({
     setActivitiesPage: (state) => {
       state.activitiesPage += 1;
     },
+    setFollowingUsersTweetsPage: (state) => {
+      state.followingUsersTweetsPage += 1;
+    },
   },
 });
 
@@ -61,6 +65,7 @@ export const {
   setUsersPage,
   setTweetRepliesPage,
   setActivitiesPage,
+  setFollowingUsersTweetsPage,
 } = paginationSlice.actions;
 
 export default paginationSlice.reducer;
