@@ -51,6 +51,11 @@ export const followApi = createApi({
               username,
               (draft) => {
                 draft.isFollowing = !draft.isFollowing;
+                if (draft.isFollowing) {
+                  draft.followersCount += 1;
+                } else {
+                  draft.followersCount -= 1;
+                }
               }
             )
           ),
@@ -64,6 +69,11 @@ export const followApi = createApi({
                 );
                 if (user) {
                   user.isFollowing = !user.isFollowing;
+                  if (user.isFollowing) {
+                    user.followerCount += 1;
+                  } else {
+                    user.followerCount -= 1;
+                  }
                 }
               }
             )
@@ -75,6 +85,11 @@ export const followApi = createApi({
               );
               if (user) {
                 user.isFollowing = !user.isFollowing;
+                if (user.isFollowing) {
+                  user.followerCount += 1;
+                } else {
+                  user.followerCount -= 1;
+                }
               }
             })
           ),

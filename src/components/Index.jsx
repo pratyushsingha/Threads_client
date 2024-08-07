@@ -2,7 +2,7 @@ import { sidebarItems, profileRoutes } from "@/utils/Index";
 import { Button } from "./ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster.jsx";
-import { ThemeProvider } from "@/context/theme-provider.jsx";
+import { ThemeProvider } from "@/components/ui/theme-provider.jsx";
 import {
   Dialog,
   DialogClose,

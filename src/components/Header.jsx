@@ -22,8 +22,13 @@ const Header = () => {
   useEffect(() => {
     if (location.pathname === "/") {
       dispatch(setHomeRoute("For You"));
+      document.title = "For You · Threads";
     } else {
       dispatch(setHomeRoute(location.pathname.split("/").pop()));
+      document.title = `${
+        location.pathname.split("/").pop().charAt(0).toUpperCase() +
+        location.pathname.split("/").pop().toLowerCase().slice(1)
+      } · Threads`;
     }
   }, [location]);
 

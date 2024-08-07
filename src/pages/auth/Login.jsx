@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,9 +22,9 @@ import { Separator } from "@/components/ui/separator";
 import Container from "@/components/Container";
 import InputDiv from "@/components/InputDiv";
 import { Checkbox } from "@/components/Index";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLoginMutation } from "@/services/authAPI";
-import { setAuthState } from "@/features/authSlice";
+import { setAuthState, setIsAuthenticated } from "@/features/authSlice";
 
 const loginSchema = z.object({
   username: z
@@ -43,7 +43,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(null);
   const [login, { isLoading }] = useLoginMutation();
-
+  const { isAuthenticated } = useSelector((store) => store.auth);
   const {
     register,
     handleSubmit,
@@ -56,14 +56,26 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleLogin = async (data) => {
     try {
-      await login(data).unwrap();
-      navigate("/");
-
+      const response = await login(data).unwrap();
       toast({
         title: `Welcome back ${data.username}`,
       });
+      navigate("/");
+      dispatch(
+        setAuthState({
+          user: response.data.user,
+          token: response.data.accessToken,
+        }),
+        setIsAuthenticated(true)
+      );
     } catch (error) {
       toast({
         variant: "destructive",

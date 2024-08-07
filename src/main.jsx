@@ -12,6 +12,7 @@ import {
   UserDetails,
   Tweets,
   BookmarkedTweets,
+  App,
 } from "@/components/Index";
 import "./index.css";
 import LikedTweets from "./pages/LikedTweets";
@@ -23,7 +24,13 @@ import RepliedTweetsPage from "./pages/RepliedTweetsPage";
 import ErrorPage from "./pages/ErrorPage";
 import FeedPage from "./pages/FeedPage";
 import SearchPage from "./pages/SearchPage";
-import ActivityPage from "./pages/ActivityPage";
+import ActivityPage, {
+  AllActivities,
+  FollowActivities,
+  LikeActivities,
+  ReplyActivities,
+  RepostActivities,
+} from "./pages/ActivityPage";
 import FollowingTweetPage from "./pages/FollowingTweetPage";
 
 const router = createBrowserRouter([
@@ -54,7 +61,32 @@ const router = createBrowserRouter([
         ],
       },
       { path: "/search", element: <SearchPage /> },
-      { path: "/activity", element: <ActivityPage /> },
+      {
+        path: "/activity",
+        element: <ActivityPage />,
+        children: [
+          {
+            path: "/activity/",
+            element: <AllActivities />,
+          },
+          {
+            path: "/activity/likes",
+            element: <LikeActivities />,
+          },
+          {
+            path: "/activity/follows",
+            element: <FollowActivities />,
+          },
+          {
+            path: "/activity/reposts",
+            element: <RepostActivities />,
+          },
+          {
+            path: "/activity/replies",
+            element: <ReplyActivities />,
+          },
+        ],
+      },
       { path: "/tweet/:id", element: <TweetDetails /> },
       {
         path: "/profile/:username",
@@ -82,10 +114,6 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
-  },
-  {
-    path: "profile/:username/reposts",
-    element: <RepostPage />,
   },
 ]);
 

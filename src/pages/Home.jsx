@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setTweetBoxType } from "@/features/tweetSlice";
+import { setIsDialogOpen, setTweetBoxType } from "@/features/tweetSlice";
 import {
   TweetBox,
   Spinner,
@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link, Outlet } from "react-router-dom";
 
 const Home = () => {
-  const { tweetBoxType } = useSelector((store) => store.tweet);
+  const { tweetBoxType, isDialogOpen } = useSelector((store) => store.tweet);
 
   const { user } = useSelector((store) => store.auth);
 
@@ -31,10 +31,13 @@ const Home = () => {
             </AvatarFallback>
           </Avatar>
         </Link>
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <p
-              onClick={() => dispatch(setTweetBoxType("createTweet"))}
+              onClick={() => {
+                dispatch(setIsDialogOpen(true));
+                dispatch(setTweetBoxType("createTweet"));
+              }}
               className="self-center"
             >
               Start a Tweet
@@ -57,7 +60,7 @@ const Home = () => {
       <div className="overflow-y-auto">
         <Outlet />
       </div>
-    </>  
+    </>
   );
 };
 

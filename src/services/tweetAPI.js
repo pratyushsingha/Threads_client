@@ -133,8 +133,8 @@ export const tweetApi = createApi({
               "getFollowingUserTweets",
               undefined,
               (tweets) => {
-                console.log(tweets)
-                // updateLikedTweet(tweets.tweets, tweetId);
+                console.log(tweets);
+                updateLikedTweet(tweets.tweets, tweetId);
               }
             )
           ),
@@ -172,6 +172,7 @@ export const tweetApi = createApi({
               "getPublicTweets",
               username,
               (tweets) => {
+                console.log(tweets);
                 updateLikedTweet(tweets.tweets, tweetId);
               }
             )
@@ -250,10 +251,9 @@ export const tweetApi = createApi({
           dispatch(
             tweetApi.util.updateQueryData(
               "getFollowingUserTweets",
-              undefined,
+              getState().pagination.followingUsersTweetsPage,
               (tweets) => {
-                console.log(tweets);
-                // updateLikedTweet(tweets.followingTweets, tweetId);
+                updateLikedTweet(tweets.followingTweets, tweetId);
               }
             )
           ),
@@ -319,8 +319,6 @@ export const tweetApi = createApi({
           ),
           dispatch(
             tweetApi.util.updateQueryData("getMyTweets", username, (tweets) => {
-              console.log(tweets);
-
               updateBookmarkedTweet(tweets.tweets, tweetId);
             })
           ),
@@ -346,6 +344,15 @@ export const tweetApi = createApi({
             tweetApi.util.updateQueryData("getTweetById", tweetId, (tweets) => {
               updateBookmarkedTweet(tweets, tweetId);
             })
+          ),
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getFollowingUserTweets",
+              getState().pagination.followingUsersTweetsPage,
+              (tweets) => {
+                updateBookmarkedTweet(tweets.followingTweets, tweetId);
+              }
+            )
           ),
 
           dispatch(
@@ -411,7 +418,7 @@ export const tweetApi = createApi({
     getPublicTweets: builder.query({
       query: ({ username, page }) => `/tweet/${username}?page=${page}&limit=20`,
       providesTags: ["publicTweets"],
-      serializeQueryArgs: (args) => args,
+      serializeQueryArgs: ({ page }) => page,
       merge: (currentCache, newTweets) => {
         currentCache.tweets.push(...newTweets.tweets);
       },

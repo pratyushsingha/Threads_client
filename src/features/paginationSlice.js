@@ -10,7 +10,11 @@ const initialState = {
   BookmarkedTweetsPage: 1,
   usersPage: 1,
   tweetRepliesPage: 1,
-  activitiesPage: 1,
+  allActivitiesPage: 1,
+  replyActivitiesPage: 1,
+  repostActivitiesPage: 1,
+  likeActivitiesPage: 1,
+  followActivitiesPage: 1,
   followingUsersTweetsPage: 1,
 };
 
@@ -45,8 +49,20 @@ export const paginationSlice = createSlice({
     setTweetRepliesPage: (state) => {
       state.tweetRepliesPage += 1;
     },
-    setActivitiesPage: (state) => {
-      state.activitiesPage += 1;
+    setAllActivitiesPage: (state) => {
+      state.allActivitiesPage += 1;
+    },
+    setReplyActivitiesPage: (state) => {
+      state.replyActivitiesPage += 1;
+    },
+    setRepostActivitiesPage: (state) => {
+      state.repostActivitiesPage += 1;
+    },
+    setFollowActivitiesPage: (state) => {
+      state.followActivitiesPage += 1;
+    },
+    setLikeActivitiesPage: (state) => {
+      state.likeActivitiesPage += 1;
     },
     setFollowingUsersTweetsPage: (state) => {
       state.followingUsersTweetsPage += 1;
@@ -66,6 +82,12 @@ export const {
   setTweetRepliesPage,
   setActivitiesPage,
   setFollowingUsersTweetsPage,
+  setAllActivitiesPage,
+  setRepostActivitiesPage,
+
+  setLikeActivitiesPage,
+  setReplyActivitiesPage,
+  setFollowActivitiesPage,
 } = paginationSlice.actions;
 
 export default paginationSlice.reducer;

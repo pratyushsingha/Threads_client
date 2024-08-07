@@ -8,7 +8,14 @@ export const activityApi = createApi({
   }),
   endpoints: (builder) => ({
     getAllActivities: builder.query({
-      query: (page) => `?page=${page}&limit=20`,
+      query: ({ filter, page }) => `?filter=${filter}&page=${page}&limit=20`,
+      serializeQueryArgs: ({ endpointName, queryArgs }) => {
+        return `${endpointName}-${queryArgs.filter}-${queryArgs.page}`;
+      },
+      merge: (currentCache, newActivities) => {
+        return currentCache.activities.push(newActivities.activities);
+      },
+      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
       transformResponse: (response) => response.data,
     }),
   }),
