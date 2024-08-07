@@ -70,7 +70,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passStrength, setPassStrength] = useState(-1);
   const [loader, setLoader] = useState(false);
-  // const { progress, setProgress } = useContext(AppContext);
 
   const registerUser = async (data) => {
     setLoader(true);
@@ -91,13 +90,11 @@ const Register = () => {
         }
       );
       setLoader(false);
-      // setProgress(progress + 100);
       toast({
         title: "success",
         description: `welcome ${response.data.data.username}`,
       });
       navigate("/login");
-      // console.log(response);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -114,7 +111,7 @@ const Register = () => {
       <Container className="flex justify-center items-center mt-20">
         <Card className="w-[400px]">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">X</CardTitle>
+            <CardTitle className="text-2xl">Threads</CardTitle>
             <CardDescription>Create Account</CardDescription>
           </CardHeader>
           <CardContent>

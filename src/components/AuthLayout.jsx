@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { App, Spinner } from "./Index";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   useCheckAuthStatusQuery,
   useGetCurrentUserQuery,
@@ -34,7 +34,7 @@ const AuthLayout = () => {
         navigate("/login");
       }
     }
-  }, [authLoading, authStatus, location.pathname, navigate, ,]);
+  }, [authLoading, authStatus, location.pathname, navigate]);
 
   useEffect(() => {
     if (currentUser) {
@@ -45,7 +45,11 @@ const AuthLayout = () => {
   if (authLoading || currentUserLoading) return <Spinner />;
   if (authError || currentUserError) return <p>Something went wrong</p>;
 
-  return authStatus?.isAuthenticated ? <App /> : null;
+  return authStatus?.isAuthenticated ? (
+    <App />
+  ) : (
+    <Navigate to="/login" replace />
+  );
 };
 
 export default AuthLayout;

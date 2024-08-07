@@ -3,12 +3,13 @@ import TweetCard from "@/components/TweetCard";
 import { setRepliedTweetsPage } from "@/features/paginationSlice";
 import { useGetRepliedTweetsQuery } from "@/services/replyAPI";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const RepliedTweetsPage = () => {
   const { username } = useParams();
   const { repliedTweetsPageNo } = useSelector((store) => store.pagination);
+  const dispatch = useDispatch();
   const {
     data: repliedTweets,
     isLoading,

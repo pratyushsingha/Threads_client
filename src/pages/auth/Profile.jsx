@@ -5,13 +5,11 @@ import {
   useLocation,
   useParams,
 } from "react-router-dom";
-import moment from "moment";
 
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -30,7 +28,7 @@ import {
   useUpdateUserDetailsMutation,
 } from "@/services/followAPI";
 import { useGetCurrentUserQuery } from "@/services/authAPI";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { setUsernameParams } from "@/features/authSlice";
 import { z } from "zod";
@@ -38,12 +36,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const profileSchema = z.object({
   firstName: z.string().nonempty("First name is required"),
@@ -66,7 +58,8 @@ const Profile = () => {
   const { username } = useParams();
   const dispatch = useDispatch();
   const [handleFollow] = useHandleFollowMutation();
-  const { data: user } = useGetCurrentUserQuery();
+  const { user } = useSelector((store) => store.auth);
+
   const {
     data: userProfile,
     isLoading: profileDetailsLoading,
@@ -74,6 +67,8 @@ const Profile = () => {
   } = useGetUserProfileDetailsQuery(username);
   const [updateProfile, { isLoading: updatingProfile }] =
     useUpdateUserDetailsMutation();
+
+  const currentPath = location.pathname.split("/").pop();
 
   const {
     register,
@@ -102,7 +97,6 @@ const Profile = () => {
 
   const handleUpdateProfile = async (data) => {
     try {
-      console.log(data);
       const formData = new FormData();
       formData.append("firstName", data.firstName);
       formData.append("lastName", data.lastName);
@@ -143,7 +137,22 @@ const Profile = () => {
             <p className="text-md font-medium mb-10">
               @{userProfile?.username}
             </p>
+            {userProfile?.tags &&
+              userProfile?.tags.map((tag, index) => (
+                <>
+                  <p key={index}>{tag}</p>{" "}
+                </>
+              ))}
             <p className="text-sm">{userProfile?.bio}</p>
+            {userProfile?.portfolio && (
+              <a
+                href={userProfile?.portfolio}
+                target="_blank"
+                className="text-sm text-blue-600 underline cursor-pointer my-2"
+              >
+                {userProfile?.portfolio}
+              </a>
+            )}
             <p className="mt-5 text-slate-500 text-sm">
               {userProfile?.followersCount} followers
             </p>
@@ -301,20 +310,20 @@ const Profile = () => {
           </div>
         )}
         <div className="flex justify-between p-5">
-          {profileRoutes.map(({ _id, title, path }) => (
+          {profileRoutes.map((profileRoute) => (
             <NavLink
-              key={_id}
-              to={path}
+              key={profileRoute._id}
+              to={profileRoute.path}
               className={`${
-                location.pathname.split("/").pop() === path
-                  ? "border-b-2 border-white"
-                  : ""
-              }`}
+                (currentPath === user.username ? "" : currentPath) ===
+                  `${profileRoute.path}` && "border-b border-white"
+              } `}
             >
-              {title}
+              {profileRoute.title}
             </NavLink>
           ))}
         </div>
+        <hr />
         <Outlet />
       </section>
     );

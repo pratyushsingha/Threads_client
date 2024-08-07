@@ -77,6 +77,15 @@ export const repostApi = createApi({
             )
           ),
           dispatch(
+            tweetApi.util.updateQueryData(
+              "getFollowingUserTweets",
+              getState().pagination.followingUsersTweetsPage,
+              (tweets) => {
+                updateRepostedTweet(tweets.followingTweets, tweetId);
+              }
+            )
+          ),
+          dispatch(
             replyApi.util.updateQueryData(
               "getRepliedTweets",
               username,
@@ -108,7 +117,7 @@ export const repostApi = createApi({
       invalidatesTags: ["reposts"],
     }),
     getRepostedTweets: builder.query({
-      query: ({username, page}) =>
+      query: ({ username, page }) =>
         `reposts/tweet/${username}?page=${page}&limit=20`,
       provideTags: ["reposts"],
       serializeQueryArgs: ({ page }) => page,

@@ -16,6 +16,14 @@ export const authApi = createApi({
         transformResponse: (response) => response.data,
       }),
     }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/users/logout",
+        method: "POST",
+        body: {},
+        transformResponse: (response) => response.data,
+      }),
+    }),
     checkAuthStatus: builder.query({
       query: () => "users/auth/status",
       transformResponse: (response) => response.data,
@@ -29,16 +37,14 @@ export const authApi = createApi({
       query: (page) => `users/suggestions?page=${page}&limit=20`,
       providesTags: ["User"],
       serializeQueryArgs: ({ page }) => page,
-      merge: (currentCache, newData) => [...currentCache, ...newData.users],
+      merge: (currentCache, newData) => currentCache.users.push(newData.users),
       forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
       transformResponse: (response) => response.data,
     }),
     searchUser: builder.query({
       query: ({ data, page }) =>
         `users/search?query=${data}&page=${page}&limit=20`,
-      serializeQueryArgs: ({ page }) => page,
-      merge: (currentCache, newData) => [...currentCache, ...newData.users],
-      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
+      serializeQueryArgs: ({ data }) => data,
       transformResponse: (response) => response.data,
     }),
   }),
@@ -50,4 +56,7 @@ export const {
   useUserSuggetionsQuery,
   useLazySearchUserQuery,
   useCheckAuthStatusQuery,
+  useLazyGetCurrentUserQuery,
+  useLazyCheckAuthStatusQuery,
+  useLogoutMutation,
 } = authApi;

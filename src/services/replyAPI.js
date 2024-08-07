@@ -17,7 +17,7 @@ export const replyApi = createApi({
         `tweet/reply/u/${username}?page=${page}&limit=20`,
       serializeQueryArgs: ({ page }) => page,
       merge: (currentCache, newReplies) => {
-        currentCache.push(...newReplies.repliedTweets);
+        currentCache.repliedTweets.push(...newReplies.repliedTweets);
       },
       forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
       transformResponse: (response) => response.data,
@@ -49,6 +49,20 @@ export const replyApi = createApi({
             tweetApi.util.updateQueryData("getTweetById", tweetId, (draft) => {
               draft[0].commentCount += 1;
             })
+          ),
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getFollowingUserTweets",
+              getState().pagination.followingUsersTweetsPage,
+              (tweets) => {
+                const tweet = tweets.followingTweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
+                if (tweet) {
+                  tweet.commentCount += 1;
+                }
+              }
+            )
           ),
           dispatch(
             replyApi.util.updateQueryData(

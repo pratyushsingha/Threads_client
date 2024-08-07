@@ -19,11 +19,6 @@ const InfiniteScrollTemplate = ({
       next={next}
       hasMore={hasNextPage}
       loader={<Spinner />}
-      endMessage={
-        <p className="my-3 flex justify-center">
-          <b>Yay! You have seen it all</b>
-        </p>
-      }
     >
       {data?.map((tweet) => (
         <section key={tweet._id}>

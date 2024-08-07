@@ -4,7 +4,7 @@ import { FaRegUser } from "react-icons/fa";
 export const sidebarItems = [
   {
     _id: 1,
-    title: "/",
+    title: import.meta.env.VITE_FRONTEND_URL,
     icon: <GoHome />,
   },
   {
@@ -19,7 +19,7 @@ export const sidebarItems = [
   },
   {
     _id: 4,
-    title: "profile",
+    title: `profile`,
     icon: <FaRegUser />,
   },
 ];
@@ -62,5 +62,33 @@ export const homeRoutes = [
     _id: 1,
     title: "Saved",
     path: "saved",
+  },
+];
+
+export const activityRoutes = [
+  {
+    _id: 1,
+    title: "All",
+    path: "activity",
+  },
+  {
+    _id: 3,
+    title: "Likes",
+    path: "likes",
+  },
+  {
+    _id: 3,
+    title: "Replies",
+    path: "replies",
+  },
+  {
+    _id: 4,
+    title: "Reposts",
+    path: "reposts",
+  },
+  {
+    _id: 5,
+    title: "Follows",
+    path: "follows",
   },
 ];
