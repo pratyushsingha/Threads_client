@@ -46,7 +46,7 @@ const Sidebar = () => {
           <button className="hidden md:block">
             <img
               className="w-9 h-9 text-white"
-              src="http://localhost:5173/threadsLogo.svg"
+              src="/threadsLogo.svg"
               alt="threads logo"
             />
           </button>

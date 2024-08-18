@@ -13,7 +13,6 @@ function App() {
           </div>
           <div className="flex-1 flex flex-col overflow-hidden my-3">
             <Header />
-
             <div className="flex-1 md:w-8/12 overflow-y-auto hide-scrollbar bg-[#181818] rounded-t-3xl">
               <Outlet />
             </div>
