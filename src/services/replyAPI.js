@@ -165,7 +165,7 @@ export const replyApi = createApi({
     }),
     getTweetReplies: builder.query({
       query: (tweetId, page) => `/tweet/reply/${tweetId}?page=${page}&limit=50`,
-      returnreturn
+
       transformResponse: (response) => response.data,
     }),
   }),
