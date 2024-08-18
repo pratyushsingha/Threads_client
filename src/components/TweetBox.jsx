@@ -231,8 +231,8 @@ const TweetBox = ({ formType, id }) => {
             <Button
               type="button"
               onClick={() => {
-                setTagClick(!tagClick);
                 tagRef?.current?.focus();
+                setTagClick(!tagClick);
               }}
               variant="ghost"
             >
