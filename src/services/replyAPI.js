@@ -15,7 +15,7 @@ export const replyApi = createApi({
     getRepliedTweets: builder.query({
       query: ({ username, page }) =>
         `tweet/reply/u/${username}?page=${page}&limit=20`,
-      serializeQueryArgs: ({ page }) => page,
+      serializeQueryArgs: (args) => args,
       merge: (currentCache, newReplies) => {
         currentCache.repliedTweets.push(...newReplies.repliedTweets);
       },
@@ -165,7 +165,7 @@ export const replyApi = createApi({
     }),
     getTweetReplies: builder.query({
       query: (tweetId, page) => `/tweet/reply/${tweetId}?page=${page}&limit=50`,
-
+      returnreturn
       transformResponse: (response) => response.data,
     }),
   }),

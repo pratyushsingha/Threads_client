@@ -120,7 +120,7 @@ export const repostApi = createApi({
       query: ({ username, page }) =>
         `reposts/tweet/${username}?page=${page}&limit=20`,
       provideTags: ["reposts"],
-      serializeQueryArgs: ({ page }) => page,
+      serializeQueryArgs: (args) => args,
       merge: (currentCache, newReposts) => {
         currentCache.reposts.push(...newReposts.reposts);
       },
