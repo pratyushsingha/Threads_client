@@ -1,4 +1,4 @@
-import {useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { Heart, Bookmark, Share2, MessageCircle, Copy } from "lucide-react";
@@ -62,7 +62,11 @@ const TweetCard = ({ tweet }) => {
   return (
     <div className="relative w-full">
       <div className="flex p-4 text-white ">
-        <Link to={`/profile/${tweet.ownerDetails.username}`}>
+        <Link
+          to={`${
+            tweet.isAnonymous ? "" : `/profile/${tweet.ownerDetails.username}`
+          }`}
+        >
           <Avatar>
             <AvatarImage
               src={tweet.isAnonymous ? "/image.png" : tweet.ownerDetails.avatar}
