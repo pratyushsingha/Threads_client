@@ -65,9 +65,23 @@ export const replyApi = createApi({
             )
           ),
           dispatch(
+            tweetApi.util.updateQueryData(
+              "getLikedTweets",
+              getState().pagination.likedTweetsPage,
+              (draft) => {
+                const tweet = draft.tweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
+                if (tweet) {
+                  tweet.commentCount += 1;
+                }
+              }
+            )
+          ),
+          dispatch(
             replyApi.util.updateQueryData(
               "getRepliedTweets",
-              username,
+              { username, page: getState().pagination.repliedTweetsPageNo },
               (draft) => {
                 const tweet = draft.repliedTweets.find(
                   (tweet) => tweet._id === tweetId
@@ -99,10 +113,14 @@ export const replyApi = createApi({
               }
             )
           ),
+          { username, page: getState().pagination.repostedTweetsPage },
+
           dispatch(
             repostApi.util.updateQueryData(
               "getRepostedTweets",
               username,
+              username,
+              { username, page: getState().pagination.repostedTweetsPage },
               (draft) => {
                 const tweet = draft.reposts.find(
                   (tweet) => tweet.tweetId === tweetId
@@ -125,6 +143,20 @@ export const replyApi = createApi({
             tweetApi.util.updateQueryData(
               "getPublicTweets",
               username,
+              (draft) => {
+                const tweet = draft.tweets.find(
+                  (tweet) => tweet._id === tweetId
+                );
+                if (tweet) {
+                  tweet.commentCount += 1;
+                }
+              }
+            )
+          ),
+          dispatch(
+            tweetApi.util.updateQueryData(
+              "getBookmarkedTweets",
+              getState().pagination.BookmarkedTweetsPage,
               (draft) => {
                 const tweet = draft.tweets.find(
                   (tweet) => tweet._id === tweetId
