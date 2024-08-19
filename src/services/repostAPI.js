@@ -88,7 +88,7 @@ export const repostApi = createApi({
           dispatch(
             replyApi.util.updateQueryData(
               "getRepliedTweets",
-              username,
+              { username, page: getState().pagination.repliedTweetsPageNo },
               (repliedTweets) => {
                 const tweet = repliedTweets.repliedTweets.find(
                   (repliedTweet) => repliedTweet._id === tweetId

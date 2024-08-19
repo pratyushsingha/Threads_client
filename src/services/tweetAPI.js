@@ -117,6 +117,7 @@ export const tweetApi = createApi({
       async onQueryStarted(tweetId, { dispatch, queryFulfilled, getState }) {
         const username = getState().auth.usernameParams;
         const id = getState().auth.idParams;
+        console.log(username);
 
         const tweetUpdate = [
           dispatch(
@@ -196,7 +197,7 @@ export const tweetApi = createApi({
           dispatch(
             repostApi.util.updateQueryData(
               "getRepostedTweets",
-              username,
+              { username, page: getState().pagination.repostedTweetsPage },
               (repostedTweets) => {
                 const tweet = repostedTweets.reposts.find(
                   (tweet) => tweet.tweetId === tweetId
@@ -215,7 +216,7 @@ export const tweetApi = createApi({
           dispatch(
             replyApi.util.updateQueryData(
               "getRepliedTweets",
-              username,
+              { username, page: getState().pagination.repliedTweetsPageNo },
               (repliedTweets) => {
                 const tweet = repliedTweets.repliedTweets.find(
                   (repliedTweet) => repliedTweet._id === tweetId
@@ -358,7 +359,7 @@ export const tweetApi = createApi({
           dispatch(
             repostApi.util.updateQueryData(
               "getRepostedTweets",
-              username,
+              { username, page: getState().pagination.repostedTweetsPage },
               (repostedTweets) => {
                 const tweet = repostedTweets.reposts.find(
                   (tweet) => tweet.tweetId === tweetId
@@ -373,7 +374,7 @@ export const tweetApi = createApi({
           dispatch(
             replyApi.util.updateQueryData(
               "getRepliedTweets",
-              username,
+              { username, page: getState().pagination.repliedTweetsPageNo },
               (repliedTweets) => {
                 const tweet = repliedTweets.repliedTweets.find(
                   (repliedTweet) => repliedTweet._id === tweetId
