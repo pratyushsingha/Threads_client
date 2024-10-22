@@ -65,10 +65,25 @@ const Login = () => {
   const handleLogin = async (data) => {
     try {
       const response = await login(data).unwrap();
-      toast({
-        title: `Welcome back ${data.username}`,
-      });
       navigate("/");
+      dispatch(
+        setAuthState({
+          user: response.data.user,
+          token: response.data.accessToken,
+        }),
+        setIsAuthenticated(true)
+      );
+      dispatch(
+        setAuthState({
+          user: response.data.user,
+          token: response.data.accessToken,
+        }),
+        setIsAuthenticated(true)
+      );
+      toast({
+        title: `Welcome back ${response.data.user.username}`,
+      });
+      
       dispatch(
         setAuthState({
           user: response.data.user,
