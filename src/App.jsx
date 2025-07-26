@@ -4,9 +4,9 @@ import { Container, Sidebar } from "@/components/Index";
 import Header from "./components/Header";
 
 function App() {
-  <p>{import.meta.env.VITE_FRONTEND_URL}</p>
   return (
     <>
+    <p>{import.meta.env.VITE_FRONTEND_URL}</p>
       <Container className="h-screen flex flex-col">
         <div className="flex-1 flex">
           <div className="hidden md:block md:w-1/4 lg:w-1/5 xl:w-1/6 h-full">
